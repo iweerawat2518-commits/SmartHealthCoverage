@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Health Coverage</title>
+<meta name="description" content="SMART HEALTH COVERAGE – BUENGNIAM ระบบฐานข้อมูลสิทธิหลักประกันสุขภาพประชาชน 12 หมู่บ้าน รพ.สต.บึงเนียม">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --em-900:#064e3b; --em-800:#065f46; --em-700:#047857; --em-600:#059669; --em-500:#10b981; --em-400:#34d399;
+  --em-100:#d1fae5; --em-50:#ecfdf5;
+  --blue:#0ea5e9; --blue-600:#0284c7; --blue-50:#e0f2fe;
+  --orange:#f97316; --orange-600:#ea580c; --orange-50:#fff7ed;
+  --red:#dc2626; --red-50:#fef2f2; --amber:#d97706; --amber-50:#fffbeb;
+  --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0; --line-2:#f1f5f9;
+  --bg:#f2f7f5; --card:#ffffff;
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px -12px rgba(6,95,70,.18);
+  --shadow-lg:0 24px 48px -16px rgba(6,78,59,.35);
+  --r:16px; --r-sm:10px;
+  --g-UC:#1baf7a; --g-SSS:#2a78d6; --g-OFC:#eb6834; --g-LGO:#6250d6; --g-OTHER:#eda100; --g-NONE:#e34948;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Prompt','Kanit',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4,.kanit{font-family:'Kanit','Prompt',sans-serif;font-weight:600;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--em-700)}
+[hidden]{display:none!important}
+.num{font-family:'Kanit',sans-serif;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:13px} .xs{font-size:12px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.ico{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ico-sm{width:16px;height:16px}
+
+/* ---------- Buttons / inputs ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;border-radius:12px;padding:9px 16px;cursor:pointer;font-weight:500;transition:.15s;white-space:nowrap;background:#fff;color:var(--ink-2);border-color:var(--line)}
+.btn:hover{border-color:var(--em-400);color:var(--em-700)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--em-500),var(--em-700));color:#fff;border:none;box-shadow:0 6px 16px -6px rgba(5,150,105,.6)}
+.btn-primary:hover{color:#fff;filter:brightness(1.06)}
+.btn-blue{background:var(--blue-600);color:#fff;border:none}.btn-blue:hover{color:#fff;filter:brightness(1.08)}
+.btn-orange{background:var(--orange);color:#fff;border:none}.btn-orange:hover{color:#fff;filter:brightness(1.05)}
+.btn-danger{background:#fff;color:var(--red);border-color:#fecaca}.btn-danger:hover{background:var(--red-50);color:var(--red);border-color:var(--red)}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-sm{padding:6px 11px;font-size:13px;border-radius:9px}
+.btn-icon{padding:8px;border-radius:10px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:13px;color:var(--ink-2);font-weight:500}
+.input,select.input,textarea.input{width:100%;border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 12px;outline:none;transition:.15s;min-width:0}
+.input:focus{border-color:var(--em-500);box-shadow:0 0 0 4px rgba(16,185,129,.15)}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:14px;cursor:pointer}
+.check input{margin-top:4px;accent-color:var(--em-600)}
+
+/* ---------- Login ---------- */
+#login-view{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr;background:#fff}
+.login-brand{position:relative;overflow:hidden;color:#fff;padding:48px 56px;display:flex;flex-direction:column;justify-content:space-between;
+  background:radial-gradient(1200px 500px at -10% -10%,rgba(52,211,153,.55),transparent 60%),radial-gradient(800px 400px at 110% 110%,rgba(14,165,233,.45),transparent 60%),linear-gradient(150deg,#047857,#065f46 55%,#064e3b)}
+.login-brand:after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
+.login-brand>*{position:relative;z-index:1}
+.brand-logo{display:flex;align-items:center;gap:14px}
+.brand-logo .mark{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.14);display:grid;place-items:center;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25)}
+.login-brand h1{font-size:44px;line-height:1.1;letter-spacing:.5px;margin-top:40px}
+.login-brand h1 span{color:#a7f3d0}
+.login-brand .lead{font-size:18px;opacity:.92;margin-top:14px;max-width:520px}
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:36px;max-width:620px}
+.feat div{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px;font-size:14px}
+.feat b{display:block;font-family:Kanit;font-size:16px;margin-bottom:2px}
+.login-form-wrap{display:flex;align-items:center;justify-content:center;padding:32px 20px;background:linear-gradient(180deg,#fff,#f6fbf9)}
+.login-card{width:100%;max-width:400px}
+.login-card h2{font-size:28px;color:var(--em-800)}
+.login-card form{display:flex;flex-direction:column;gap:16px;margin-top:24px}
+.pw-wrap{position:relative}.pw-wrap .input{padding-right:44px}
+.pw-wrap button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:none;color:var(--muted);cursor:pointer;padding:6px}
+.alert{border-radius:12px;padding:11px 14px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.alert-error{background:var(--red-50);color:#991b1b;border:1px solid #fecaca}
+.alert-warn{background:var(--amber-50);color:#92400e;border:1px solid #fde68a}
+.alert-info{background:var(--blue-50);color:#075985;border:1px solid #bae6fd}
+.alert-ok{background:var(--em-50);color:var(--em-800);border:1px solid var(--em-100)}
+.pdpa{font-size:12px;color:var(--muted);margin-top:22px;border-top:1px dashed var(--line);padding-top:14px}
+
+/* ---------- App shell ---------- */
+#app{display:flex;min-height:100vh}
+.sidebar{width:264px;flex:none;background:linear-gradient(180deg,#064e3b,#065f46 40%,#047857);color:#d1fae5;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:40}
+.sb-brand{padding:20px 20px 16px;display:flex;gap:12px;align-items:center;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-brand .mark{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.sb-brand b{font-family:Kanit;color:#fff;font-size:15px;line-height:1.2;display:block}
+.sb-brand small{font-size:11.5px;opacity:.8}
+.nav{padding:14px 12px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.nav-sec{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.55;padding:12px 12px 4px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;color:#d1fae5;text-decoration:none;font-size:14.5px;transition:.15s;cursor:pointer}
+.nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav a.active{background:#fff;color:var(--em-800);font-weight:600;box-shadow:0 8px 20px -10px rgba(0,0,0,.4)}
+.sb-foot{padding:14px 18px;font-size:12px;opacity:.7;border-top:1px solid rgba(255,255,255,.1)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(242,247,245,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;gap:14px}
+.topbar h2{font-size:20px;color:var(--em-900)}
+.menu-btn{display:none}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13px;background:var(--em-50);color:var(--em-800);border:1px solid var(--em-100);white-space:nowrap}
+.chip-blue{background:var(--blue-50);color:#075985;border-color:#bae6fd}
+.chip-orange{background:var(--orange-50);color:#9a3412;border-color:#fed7aa}
+.chip-gray{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+.chip-red{background:var(--red-50);color:#991b1b;border-color:#fecaca}
+.user-chip{display:flex;align-items:center;gap:10px;padding:4px 6px 4px 4px;border-radius:999px;background:#fff;border:1px solid var(--line)}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--em-400),var(--blue));color:#fff;display:grid;place-items:center;font-family:Kanit;font-weight:600}
+.user-chip .meta{line-height:1.15;padding-right:6px}
+.user-chip .meta b{font-size:13.5px;display:block;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-chip .meta small{font-size:11.5px;color:var(--muted)}
+.content{padding:24px 28px 48px;max-width:1480px;width:100%;margin:0 auto}
+.overlay-bg{display:none}
+
+/* ---------- Cards & grid ---------- */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid rgba(226,232,240,.8);padding:20px;min-width:0}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.card-h h3{font-size:17px;color:var(--em-900)}
+.card-h .sub{font-size:12.5px;color:var(--muted)}
+.grid{display:grid;gap:18px}
+.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-32{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+.g-23{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}
+.mt{margin-top:18px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.tbl td.vname{min-width:150px;white-space:nowrap}
+.search-table td.num{white-space:nowrap}
+.kpi{position:relative;overflow:hidden;background:#fff;border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);border:1px solid rgba(226,232,240,.8)}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,var(--em-500))}
+.kpi .lbl{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.kpi .dot{width:9px;height:9px;border-radius:3px;background:var(--c,var(--em-500))}
+.kpi .val{font-family:Kanit;font-size:30px;font-weight:600;line-height:1.15;margin-top:6px;color:var(--ink)}
+.kpi .val small{font-size:14px;color:var(--muted);font-weight:500;margin-left:4px}
+.kpi .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.kpi.hero{background:linear-gradient(135deg,#059669,#047857 60%,#065f46);color:#fff;border:none}
+.kpi.hero:before{display:none}
+.kpi.hero .lbl,.kpi.hero .sub{color:#d1fae5}.kpi.hero .val{color:#fff}
+.kpi .bar{height:5px;border-radius:99px;background:var(--line-2);margin-top:9px;overflow:hidden}
+.kpi .bar i{display:block;height:100%;background:var(--c,var(--em-500));border-radius:99px}
+.chart-box{position:relative;height:300px}
+.chart-box.tall{height:380px}
+.chart-box.short{height:240px}
+
+.page-hero{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.page-hero h1{font-size:26px;color:var(--em-900);line-height:1.2}
+.page-hero p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.village-banner{position:relative;overflow:hidden;border-radius:20px;padding:24px 28px;color:#fff;margin-bottom:18px;
+  background:radial-gradient(600px 220px at 100% 0,rgba(14,165,233,.5),transparent 60%),linear-gradient(135deg,#10b981,#047857 55%,#065f46);box-shadow:var(--shadow-lg)}
+.village-banner .eyebrow{font-family:Kanit;letter-spacing:2px;font-size:13px;opacity:.9}
+.village-banner h1{font-size:32px;margin:4px 0 2px}
+.village-banner p{margin:0;opacity:.92}
+.village-banner .badge-orange{position:absolute;right:24px;top:22px;background:var(--orange);color:#fff;border-radius:999px;padding:4px 14px;font-size:13px;font-family:Kanit}
+
+/* ---------- Tables ---------- */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;-webkit-overflow-scrolling:touch}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+.tbl th{background:#f7faf9;color:var(--ink-2);font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.tbl tbody tr:hover{background:#f8fdfb}
+.tbl td.r,.tbl th.r{text-align:right}
+.tbl td.c,.tbl th.c{text-align:center}
+.tbl tfoot td{font-weight:600;background:#f7faf9;border-top:1px solid var(--line)}
+.tbl tr.click{cursor:pointer}
+.minibar{display:flex;align-items:center;gap:8px;min-width:120px}
+.minibar span{flex:1;height:7px;background:var(--line-2);border-radius:99px;overflow:hidden}
+.minibar i{display:block;height:100%;border-radius:99px}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.b-ok{background:var(--em-50);color:var(--em-800)}.b-warn{background:var(--amber-50);color:#92400e}.b-err{background:var(--red-50);color:#991b1b}
+.b-info{background:var(--blue-50);color:#075985}.b-gray{background:#f1f5f9;color:#475569}.b-orange{background:var(--orange-50);color:#9a3412}
+
+/* ---------- Insights / flags ---------- */
+.insights{display:flex;flex-direction:column;gap:10px}
+.ins{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#f8fafc;border:1px solid var(--line-2);font-size:14px}
+.ins .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none}
+.ins.good .ic{background:var(--em-50);color:var(--em-700)}
+.ins.info .ic{background:var(--blue-50);color:var(--blue-600)}
+.ins.warn .ic{background:var(--orange-50);color:var(--orange-600)}
+.ins .act{margin-left:auto}
+.flag-list{display:flex;flex-direction:column;gap:8px}
+.flag-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line-2);border-radius:12px}
+.flag-item .n{font-family:Kanit;font-size:20px;min-width:52px;text-align:right}
+.flag-item .t{flex:1;font-size:14px}
+.mm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mm .box{border-radius:14px;padding:14px;border:1px solid var(--line)}
+.mm .box.max{background:linear-gradient(135deg,#ecfdf5,#fff)}
+.mm .box.min{background:linear-gradient(135deg,#fff7ed,#fff)}
+.mm .box b{font-family:Kanit;font-size:24px;display:block}
+
+/* ---------- Filters / search ---------- */
+.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.filters .wide{grid-column:span 2}
+.result-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 10px}
+.pager{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+.person-cards{display:none}
+
+/* ---------- Import ---------- */
+.steps{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:14px;color:var(--muted)}
+.step i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--line-2);font-family:Kanit;font-size:13px}
+.step.on{border-color:var(--em-500);color:var(--em-800);background:var(--em-50)}
+.step.on i{background:var(--em-600);color:#fff}
+.step.done i{background:var(--em-100);color:var(--em-700)}
+.drop{display:block;border:2px dashed #a7f3d0;border-radius:18px;padding:36px 20px;text-align:center;background:linear-gradient(180deg,#f0fdf8,#fff);cursor:pointer;transition:.15s}
+.drop:hover,.drop.over{border-color:var(--em-500);background:#ecfdf5}
+.drop .big{width:64px;height:64px;border-radius:18px;margin:0 auto 10px;display:grid;place-items:center;background:#fff;color:var(--em-600);box-shadow:var(--shadow)}
+.file-info{display:flex;gap:14px;align-items:center;padding:14px;border-radius:14px;background:#fff;border:1px solid var(--line);margin-top:14px}
+.file-info .fi{width:46px;height:46px;border-radius:12px;background:#ecfdf5;color:var(--em-700);display:grid;place-items:center}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{border-radius:14px;padding:12px 14px;border:1px solid var(--line);background:#fff}
+.stat b{font-family:Kanit;font-size:24px;display:block;line-height:1.2}
+.stat span{font-size:12.5px;color:var(--muted)}
+.stat.ok{border-color:#a7f3d0;background:#f0fdf8}.stat.up{border-color:#bae6fd;background:#f0f9ff}
+.stat.bad{border-color:#fecaca;background:#fef2f2}.stat.warn{border-color:#fed7aa;background:#fff7ed}
+.map-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.map-grid div{font-size:13px;padding:6px 10px;border-radius:9px;background:#f8fafc;display:flex;gap:6px;align-items:center}
+.map-grid .ok{color:var(--em-700)}.map-grid .no{color:var(--muted)}.map-grid .req{color:var(--red);font-weight:600}
+
+/* ---------- Modal / toast / loading ---------- */
+.modal{position:fixed;inset:0;background:rgba(6,30,24,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
+.modal-card{background:#fff;border-radius:20px;width:100%;max-width:640px;max-height:calc(100vh - 32px);overflow:auto;box-shadow:var(--shadow-lg)}
+.modal-card.wide{max-width:900px}
+.modal-h{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+.modal-h h3{font-size:19px;color:var(--em-900)}
+.modal-b{padding:20px 22px}
+.modal-f{display:flex;gap:10px;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--line);flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+.dl{display:grid;grid-template-columns:170px 1fr;gap:8px 14px;font-size:14px}
+.dl dt{color:var(--muted)}.dl dd{margin:0;font-weight:500;word-break:break-word}
+.sec-t{font-family:Kanit;color:var(--em-800);font-size:15px;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+.sec-t:first-child{margin-top:0}
+.temp-pw{font-family:Kanit;font-size:26px;letter-spacing:2px;background:#f0fdf8;border:1px dashed var(--em-500);border-radius:12px;padding:12px;text-align:center;color:var(--em-800)}
+#toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:200;max-width:calc(100vw - 36px)}
+.toast{background:#0f172a;color:#fff;border-radius:12px;padding:12px 16px;box-shadow:var(--shadow-lg);display:flex;gap:10px;align-items:flex-start;max-width:420px;font-size:14px;animation:tin .2s ease-out}
+.toast.ok{background:#065f46}.toast.err{background:#991b1b}.toast.warn{background:#9a3412}
+@keyframes tin{from{transform:translateY(10px);opacity:0}}
+#loading{position:fixed;inset:0;background:rgba(242,247,245,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:150}
+.loader{background:#fff;border-radius:16px;padding:18px 24px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:14px;font-size:15px}
+.spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--em-100);border-top-color:var(--em-600);animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.skeleton{height:120px;border-radius:var(--r);background:linear-gradient(90deg,#eef4f1,#f8fbfa,#eef4f1);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+.report-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.rcard{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff;cursor:pointer;transition:.15s;text-align:left}
+.rcard:hover,.rcard.on{border-color:var(--em-500);box-shadow:var(--shadow);transform:translateY(-1px)}
+.rcard .ri{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--em-50);color:var(--em-700);margin-bottom:10px}
+.rcard b{font-family:Kanit;font-size:15.5px;display:block;color:var(--em-900)}
+.rcard span{font-size:13px;color:var(--muted)}
+.print-head{display:none}
+.villages-cover{display:flex;flex-wrap:wrap;gap:6px}
+/* ตัวกรองประเภทการอยู่อาศัย (segmented) */
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.seg button{border:none;background:transparent;border-radius:10px;padding:7px 12px;font-size:13.5px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.seg button:hover{background:var(--em-50);color:var(--em-800)}
+.seg button.on{background:var(--em-600);color:#fff;font-weight:600}
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filter-bar .lbl{font-size:13px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:600;border-radius:6px;padding:1px 6px;margin:0 3px 0 0;vertical-align:middle;font-family:Kanit}
+.tag-o{background:var(--orange-50);color:#9a3412;border:1px solid #fed7aa}
+.tag-b{background:var(--blue-50);color:#075985;border:1px solid #bae6fd}
+.tag-g{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.banner-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.banner-meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:3px 12px;font-size:13px}
+.vsum{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px}
+.vsum div{font-size:13px;padding:7px 10px;border-radius:9px;background:#f8fafc;display:flex;gap:8px;align-items:center}
+.vsum b{font-family:Kanit}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1180px){
+  .g-32,.g-23{grid-template-columns:minmax(0,1fr)}
+  .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:960px){
+  #login-view{grid-template-columns:1fr}
+  .login-brand{padding:28px 20px}
+  .login-brand h1{font-size:30px;margin-top:22px}
+  .feat{display:none}
+  .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .2s;box-shadow:var(--shadow-lg)}
+  body.nav-open .sidebar{transform:none}
+  body.nav-open .overlay-bg{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:35}
+  .menu-btn{display:inline-flex}
+  .topbar{padding:10px 16px}
+  .content{padding:16px 16px 40px}
+  .g-2,.g-3{grid-template-columns:minmax(0,1fr)}
+  .user-chip .meta{display:none}
+}
+@media (max-width:640px){
+  .topbar h2{font-size:16px}
+  .hide-sm{display:none!important}
+  .filters{grid-template-columns:minmax(0,1fr)}
+  .filters .wide{grid-column:auto}
+  .form-grid{grid-template-columns:1fr}
+  .dl{grid-template-columns:1fr;gap:2px}
+  .dl dd{margin-bottom:8px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .kpi{padding:12px 14px}.kpi .val{font-size:24px}
+  .village-banner{padding:20px}.village-banner h1{font-size:24px}
+  .village-banner .badge-orange{position:static;display:inline-block;margin-bottom:8px}
+  .mm{grid-template-columns:1fr}
+  .chart-box{height:260px}.chart-box.tall{height:420px}
+  .search-table{display:none}
+  .person-cards{display:flex;flex-direction:column;gap:10px}
+  .pcard{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff}
+  .modal{padding:0;align-items:flex-end}
+  .modal-card{border-radius:20px 20px 0 0;max-height:92vh}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  body{background:#fff}
+  .sidebar,.topbar,.no-print,#toasts,.btn,.steps,.report-cards{display:none!important}
+  .content{padding:0;max-width:none}
+  .card,.kpi{box-shadow:none;break-inside:avoid}
+  .print-head{display:block;border-bottom:2px solid var(--em-600);padding-bottom:8px;margin-bottom:12px}
+  body.print-report .content>section:not(#view-reports){display:none!important}
+  .tbl-wrap{overflow:visible;border:none}
+  .chart-box{height:260px!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================== LOGIN ============================== -->
+<div id="login-view">
+  <section class="login-brand">
+    <div>
+      <div class="brand-logo">
+        <div class="mark" id="logo-lg"></div>
+        <div><b class="kanit" style="font-size:18px">รพ.สต.บึงเนียม</b><div style="opacity:.85;font-size:13px">ต.บึงเนียม อ.เมือง จ.ขอนแก่น</div></div>
+      </div>
+      <h1>SMART HEALTH<br><span>COVERAGE</span> – BUENGNIAM</h1>
+      <p class="lead">ระบบฐานข้อมูลสิทธิหลักประกันสุขภาพประชาชน 12 หมู่บ้าน เชื่อมการทำงาน รพ.สต. กับ อสม. อย่างปลอดภัย</p>
+      <div class="feat">
+        <div><b>Dashboard</b>ภาพรวมสิทธิรายหมู่บ้าน</div>
+        <div><b>อสม. 12 หมู่</b>เห็นเฉพาะหมู่บ้านตนเอง</div>
+        <div><b>PDPA</b>ปิดบังเลขบัตรประชาชน</div>
+      </div>
+    </div>
+    <div class="small" style="opacity:.75">© รพ.สต.บึงเนียม · ข้อมูลสุขภาพเป็นความลับ ใช้เพื่อการดูแลสุขภาพประชาชนเท่านั้น</div>
+  </section>
+  <section class="login-form-wrap">
+    <div class="login-card">
+      <span class="chip">เข้าสู่ระบบ</span>
+      <h2 style="margin-top:12px">ยินดีต้อนรับ</h2>
+      <p class="muted" style="margin:6px 0 0">สำหรับเจ้าหน้าที่ รพ.สต. และ อสม. ที่ได้รับบัญชีผู้ใช้งาน</p>
+      <div id="cfg-warning" class="alert alert-warn" style="margin-top:18px" hidden></div>
+      <form id="login-form" autocomplete="on">
+        <div class="field"><label for="lg-user">ชื่อผู้ใช้ (Username)</label>
+          <input class="input" id="lg-user" name="username" autocomplete="username" required maxlength="32" placeholder="เช่น osm.m08"></div>
+        <div class="field"><label for="lg-pass">รหัสผ่าน</label>
+          <div class="pw-wrap"><input class="input" id="lg-pass" type="password" name="password" autocomplete="current-password" required maxlength="64">
+          <button type="button" data-action="toggle-pw" data-target="lg-pass" aria-label="แสดงรหัสผ่าน"></button></div></div>
+        <div id="login-error" class="alert alert-error" hidden></div>
+        <button class="btn btn-primary" type="submit" id="login-btn" style="justify-content:center;padding:12px">เข้าสู่ระบบ</button>
+      </form>
+      <div class="pdpa">การเข้าใช้งานทุกครั้งจะถูกบันทึกตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 ห้ามเปิดเผยข้อมูลประชาชนแก่ผู้ไม่เกี่ยวข้อง
+        หากลืมรหัสผ่านกรุณาติดต่อผู้ดูแลระบบ รพ.สต.</div>
+    </div>
+  </section>
+</div>
+
+<!-- ============================== APP ============================== -->
+<div id="app" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand"><div class="mark" id="logo-sm"></div>
+      <div><b>SMART HEALTH COVERAGE</b><small>BUENGNIAM · รพ.สต.บึงเนียม</small></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sb-foot" id="sb-foot"></div>
+  </aside>
+  <div class="overlay-bg" data-action="close-nav"></div>
+  <div class="main">
+    <header class="topbar">
+      <button class="btn btn-icon menu-btn" data-action="open-nav" aria-label="เมนู"></button>
+      <h2 id="page-title">Dashboard</h2>
+      <span id="top-village" class="chip hide-sm" hidden></span>
+      <div class="spacer"></div>
+      <div class="user-chip" title="บัญชีของฉัน" data-action="go" data-view="account" style="cursor:pointer">
+        <div class="avatar" id="u-avatar">U</div>
+        <div class="meta"><b id="u-name"></b><small id="u-role"></small></div>
+      </div>
+      <button class="btn btn-sm" data-action="logout" id="logout-btn"></button>
+    </header>
+    <main class="content" id="content">
+      <section id="view-overview" hidden></section>
+      <section id="view-village" hidden></section>
+      <section id="view-search" hidden></section>
+      <section id="view-reports" hidden></section>
+      <section id="view-import" hidden></section>
+      <section id="view-history" hidden></section>
+      <section id="view-users" hidden></section>
+      <section id="view-audit" hidden></section>
+      <section id="view-settings" hidden></section>
+      <section id="view-account" hidden></section>
+    </main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="loading" hidden><div class="loader"><div class="spin"></div><span id="loading-text">กำลังโหลดข้อมูล...</span></div></div>
+
+<!-- ======================================================================
+     IMPORT PARSER (ฟังก์ชันอ่าน/จับคู่คอลัมน์ Excel – ไม่ขึ้นกับหน้าจอ)
+     ====================================================================== -->
+<script id="import-parser">
+var SHC_PARSER = (function () {
+  'use strict';
+  /* จับคู่หัวคอลัมน์ Excel กับฟิลด์ของระบบ (ไม่สนตัวพิมพ์/ช่องว่าง)
+     รองรับ 2 รูปแบบ:  JHCIS "รายงานเป้าหมายประชากร Type 1,2,3 สิทธิ์การรักษา"  และ  สปสช. "ผลตรวจสอบสิทธิ (CheckRightGroupData)"
+     exact = ชื่อหัวตารางตรงทั้งหมด, has = มีข้อความนี้อยู่ในหัวตาราง */
+  var RULES = [
+    { f: 'pid', exact: ['เลขประจำตัวประชาชน', 'เลขบัตรประชาชน', 'เลขบัตรประจำตัวประชาชน', 'cid', 'pid'], has: ['เลขประจำตัวประชาชน', 'เลขบัตรประชาชน'] },
+    { f: 'fullName', exact: ['ชื่อ-สกุล', 'ชื่อ - สกุล', 'ชื่อ-นามสกุล', 'ชื่อ - นามสกุล', 'ชื่อสกุล', 'ชื่อ นามสกุล', 'fullname', 'full name'] },
+    { f: 'firstName', exact: ['ชื่อ', 'firstname', 'first name', 'fname'] },
+    { f: 'lastName', exact: ['นามสกุล', 'lastname', 'last name', 'lname'] },
+    { f: 'gender', exact: ['เพศ', 'sex', 'gender'] },
+    { f: 'birthDate', exact: ['ว/ด/ป/เกิด', 'ว/ด/ป เกิด', 'วันเกิด', 'วันเดือนปีเกิด', 'birthdate', 'birth', 'dob'], has: ['ว/ด/ป/เกิด', 'วันเดือนปีเกิด'] },
+    { f: 'ageText', exact: ['อายุ', 'อายุ(ปี)', 'อายุ (ปี)', 'age'] },
+    { f: 'typeArea', exact: ['ประเภทการอยู่', 'ประเภทการอยู่อาศัย', 'typearea', 'type area'], has: ['ประเภทการอยู่'] },
+    { f: 'houseNo', exact: ['บ้านเลขที่', 'เลขที่บ้าน', 'houseno', 'house no'] },
+    { f: 'moo', exact: ['หมู่', 'หมู่ที่', 'ม.', 'moo', 'villageid', 'รหัสหมู่บ้าน'] },
+    { f: 'villageName', exact: ['หมู่บ้าน', 'ชื่อหมู่บ้าน', 'villagename', 'village'] },
+    { f: 'hn', exact: ['hn'] },
+    { f: 'hcode', exact: ['รหัสหน่วยบริการ', 'hcode', 'hospcode'] },
+    { f: 'rightCode', exact: ['รหัสสิทธิ์', 'รหัสสิทธิ', 'รหัสสิทธิการรักษา', 'pttype'] },
+    { f: 'rightName', exact: ['สิทธิ์การรักษา', 'สิทธิการรักษา', 'ชื่อสิทธิ์', 'ชื่อสิทธิการรักษา'] },
+    { f: 'mainInscl', exact: ['maininscl'], has: ['(maininscl)', 'รหัสสิทธิหลัก'] },
+    { f: 'mainInsclName', has: ['ชื่อสิทธิหลัก'] },
+    { f: 'subInscl', exact: ['subinscl'], has: ['(subinscl)', 'รหัสสิทธิย่อย'] },
+    { f: 'subInsclName', has: ['ชื่อสิทธิย่อย'] },
+    { f: 'checkDate', has: ['วันที่ตรวจสอบสิทธิ'] },
+    { f: 'deathStatus', has: ['สถานะการเสียชีวิต'] },
+    { f: 'hmainOp', exact: ['hmain_op'], has: ['(hmain_op)'] },
+    { f: 'hmainOpName', has: ['ชื่อหน่วยบริการประจำ'] },
+    { f: 'hsub', exact: ['hsub', 'สิทธิ์ลูกข่าย', 'สิทธิลูกข่าย', 'หน่วยบริการลูกข่าย'], has: ['(hsub)'] },
+    { f: 'hsubName', has: ['ชื่อหน่วยบริการปฐมภูมิ'] },
+    { f: 'hmain', exact: ['hmain', 'สิทธิ์แม่ข่าย', 'สิทธิแม่ข่าย', 'หน่วยบริการแม่ข่าย'], has: ['(hmain)'] },
+    { f: 'hmainName', has: ['ชื่อหน่วยบริการที่รับการส่งต่อ'] },
+    { f: 'provinceCode', has: ['(purchseprovince)', '(purchaseprovince)'] },
+    { f: 'provinceName', has: ['ชื่อจังหวัดที่ลงทะเบียน'] },
+    { f: 'paidModel', exact: ['paid_model'], has: ['(paid_model)'] },
+    { f: 'startDate', has: ['วันที่เริ่มใช้หน่วยบริการ'] },
+    { f: 'subExpireDate', exact: ['สิทธิ์หมดอายุ', 'สิทธิหมดอายุ', 'วันหมดอายุสิทธิ'], has: ['วันที่หมดสิทธิย่อย'] },
+    { f: 'remark', exact: ['หมายเหตุ', 'remark', 'note'] },
+    { f: 'cDM', exact: ['dm'] }, { f: 'cHT', exact: ['ht'] }, { f: 'cIHD', exact: ['ihd'] }, { f: 'cST', exact: ['st'] },
+    { f: 'cCA', exact: ['ca'] }, { f: 'cAM', exact: ['am'] }, { f: 'cANC', exact: ['anc'] },
+    { f: 'mobile', exact: ['mobile', 'มือถือ', 'เบอร์มือถือ', 'โทรศัพท์มือถือ'] },
+    { f: 'telPerson', exact: ['telephoneperson', 'telephone', 'โทรศัพท์', 'เบอร์โทร', 'เบอร์โทรศัพท์'] },
+    { f: 'telHome', exact: ['เบอร์ประจำบ้าน', 'โทรศัพท์บ้าน'] },
+    { f: 'staffName', exact: ['จนท.', 'จนท', 'เจ้าหน้าที่', 'เจ้าหน้าที่ผู้รับผิดชอบ'] },
+    { f: 'osmName', exact: ['อสม', 'อสม.', 'อสม.ผู้รับผิดชอบ', 'ชื่อ อสม.'] }
+  ];
+  var CHRONIC_FIELDS = { cDM: 'DM', cHT: 'HT', cIHD: 'IHD', cST: 'ST', cCA: 'CA', cAM: 'AM', cANC: 'ANC' };
+  var PHONE_FIELDS = ['mobile', 'telPerson', 'telHome'];
+  var LABELS = {
+    pid: 'เลขประจำตัวประชาชน', fullName: 'ชื่อ-สกุล', firstName: 'ชื่อ', lastName: 'นามสกุล', gender: 'เพศ',
+    birthDate: 'วันเดือนปีเกิด', ageText: 'อายุ', typeArea: 'ประเภทการอยู่ (Type)', houseNo: 'บ้านเลขที่', moo: 'หมู่ที่',
+    villageName: 'ชื่อหมู่บ้าน', hn: 'HN', hcode: 'รหัสหน่วยบริการ', rightCode: 'รหัสสิทธิ์ (JHCIS)', rightName: 'ชื่อสิทธิ์การรักษา',
+    mainInscl: 'รหัสสิทธิหลัก (MAININSCL)', mainInsclName: 'ชื่อสิทธิหลัก', subInscl: 'รหัสสิทธิย่อย (SUBINSCL)',
+    subInsclName: 'ชื่อสิทธิย่อย', checkDate: 'วันที่ตรวจสอบสิทธิ', deathStatus: 'สถานะการเสียชีวิต',
+    hmainOp: 'หน่วยบริการประจำ (HMAIN_OP)', hmainOpName: 'ชื่อหน่วยบริการประจำ', hsub: 'หน่วยบริการปฐมภูมิ/ลูกข่าย (HSUB)',
+    hsubName: 'ชื่อหน่วยบริการปฐมภูมิ', hmain: 'หน่วยบริการรับส่งต่อ/แม่ข่าย (HMAIN)', hmainName: 'ชื่อหน่วยบริการรับส่งต่อ',
+    provinceCode: 'รหัสจังหวัดที่ลงทะเบียน', provinceName: 'ชื่อจังหวัดที่ลงทะเบียน', paidModel: 'รูปแบบการจ่ายเงิน (PAID_MODEL)',
+    startDate: 'วันที่เริ่มใช้หน่วยบริการ', subExpireDate: 'วันหมดอายุสิทธิ์/สิทธิย่อย', remark: 'หมายเหตุ',
+    chronic: 'โรคเรื้อรัง (DM HT IHD ST CA AM ANC)', phone: 'เบอร์โทรศัพท์', staffName: 'จนท. ผู้รับผิดชอบ', osmName: 'อสม. ผู้รับผิดชอบ'
+  };
+  /** ฟิลด์ที่แสดงในหน้าจอจับคู่คอลัมน์ ตามรูปแบบไฟล์ */
+  var FORMAT_FIELDS = {
+    JHCIS: ['pid', 'fullName', 'gender', 'birthDate', 'ageText', 'typeArea', 'houseNo', 'moo', 'villageName', 'hn', 'hcode', 'rightCode',
+      'rightName', 'subExpireDate', 'hmain', 'hsub', 'chronic', 'phone', 'staffName', 'osmName'],
+    NHSO: ['pid', 'firstName', 'lastName', 'gender', 'ageText', 'mainInscl', 'mainInsclName', 'subInscl', 'subInsclName', 'checkDate',
+      'deathStatus', 'hmainOp', 'hmainOpName', 'hsub', 'hsubName', 'hmain', 'hmainName', 'provinceCode', 'provinceName', 'paidModel',
+      'startDate', 'subExpireDate', 'remark', 'moo']
+  };
+  /** คอลัมน์จำเป็น: แต่ละกลุ่มต้องมีชุดใดชุดหนึ่งครบ */
+  var REQUIRED = [
+    { label: 'เลขประจำตัวประชาชน', any: [['pid']] },
+    { label: 'ชื่อ-นามสกุล ("ชื่อ-สกุล" หรือ "ชื่อ" + "นามสกุล")', any: [['fullName'], ['firstName', 'lastName']] },
+    { label: 'สิทธิการรักษา ("รหัสสิทธิ์" หรือ MAININSCL)', any: [['rightCode'], ['mainInscl']] }
+  ];
+
+  function norm(h) { return String(h == null ? '' : h).replace(/\s+/g, ' ').trim().toLowerCase(); }
+
+  function mapHeaders(row) {
+    var map = {}, used = {};
+    ['exact', 'has'].forEach(function (pass) {
+      RULES.forEach(function (rule) {
+        if (map[rule.f] !== undefined) return;
+        var list = rule[pass] || [];
+        if (!list.length) return;
+        for (var i = 0; i < row.length; i++) {
+          if (used[i]) continue;
+          var h = norm(row[i]);
+          if (!h) continue;
+          var ok = pass === 'exact' ? list.indexOf(h) >= 0 : list.some(function (t) { return h.indexOf(t) >= 0; });
+          if (ok) { map[rule.f] = i; used[i] = true; break; }
+        }
+      });
+    });
+    return map;
+  }
+  function missingRequired(map) {
+    return REQUIRED.filter(function (g) {
+      return !g.any.some(function (set) { return set.every(function (f) { return map[f] !== undefined; }); });
+    }).map(function (g) { return g.label; });
+  }
+  function findHeaderRow(aoa) {
+    var best = null;
+    for (var i = 0; i < Math.min(aoa.length, 15); i++) {
+      var map = mapHeaders(aoa[i] || []);
+      var hit = REQUIRED.length - missingRequired(map).length;
+      if (hit >= 2 && (!best || hit > best.hit || (hit === best.hit && Object.keys(map).length > Object.keys(best.map).length))) best = { index: i, map: map, hit: hit };
+    }
+    return best;
+  }
+  function detectFormat(map) { return map.rightCode !== undefined ? 'JHCIS' : 'NHSO'; }
+  /** ชื่อคอลัมน์ที่ส่งให้เซิร์ฟเวอร์ (รวมคอลัมน์โรคเรื้อรัง/เบอร์โทรเป็นฟิลด์เดียว) */
+  function columnsOf(map) {
+    var cols = [];
+    Object.keys(map).forEach(function (f) {
+      var c = CHRONIC_FIELDS[f] ? 'chronic' : PHONE_FIELDS.indexOf(f) >= 0 ? 'phone' : f;
+      if (cols.indexOf(c) < 0) cols.push(c);
+    });
+    return cols;
+  }
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function cellToString(v, field) {
+    if (v === null || v === undefined) return '';
+    if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)) {
+      var y = v.getFullYear(); if (y < 2400) y += 543;            // แปลงเป็น พ.ศ. ตามรูปแบบไฟล์ สปสช./JHCIS
+      return pad(v.getDate()) + '/' + pad(v.getMonth() + 1) + '/' + y;
+    }
+    if (typeof v === 'number') {
+      var s = Number.isInteger(v) ? v.toFixed(0) : String(v);
+      if (field === 'pid' && s.length === 12) s = '0' + s;      // เลข 0 นำหน้าหายเมื่อเก็บเป็นตัวเลข
+      if (['hsub', 'hmainOp', 'hmain', 'hcode'].indexOf(field) >= 0 && s.length < 5) s = ('00000' + s).slice(-5);
+      return s;
+    }
+    return String(v).replace(/\s+/g, ' ').trim();
+  }
+  function toRecords(aoa, headerIndex, map) {
+    var out = [], fields = Object.keys(map);
+    var hasChronic = fields.some(function (f) { return CHRONIC_FIELDS[f]; });
+    var hasPhone = fields.some(function (f) { return PHONE_FIELDS.indexOf(f) >= 0; });
+    for (var r = headerIndex + 1; r < aoa.length; r++) {
+      var row = aoa[r] || [];
+      var any = false;
+      var rec = { _row: r + 1 };
+      fields.forEach(function (f) {
+        var s = cellToString(row[map[f]], f);
+        if (f === 'pid') s = s.replace(/[\s-]/g, '');
+        rec[f] = s;
+        if (s && !CHRONIC_FIELDS[f]) any = true;
+      });
+      if (!any) continue;
+      if (hasChronic) {
+        var ch = [];
+        Object.keys(CHRONIC_FIELDS).forEach(function (f) {
+          if (rec[f] === undefined) return;
+          var v = String(rec[f]).trim().toLowerCase();
+          if (v && ['0', '-', 'n', 'no', 'ไม่มี', 'false'].indexOf(v) < 0) ch.push(CHRONIC_FIELDS[f]);
+          delete rec[f];
+        });
+        rec.chronic = ch.join(',');
+      }
+      if (hasPhone) {
+        rec.phone = PHONE_FIELDS.map(function (f) { var v = rec[f] || ''; delete rec[f]; return v; }).filter(Boolean).join(',');
+      }
+      out.push(rec);
+    }
+    return out;
+  }
+
+  function pidChecksumOk(p) {
+    if (!/^\d{13}$/.test(p)) return false;
+    var s = 0;
+    for (var i = 0; i < 12; i++) s += Number(p.charAt(i)) * (13 - i);
+    return (11 - (s % 11)) % 10 === Number(p.charAt(12));
+  }
+  function maskPid(p) {
+    p = String(p || '');
+    return p.length === 13 ? 'x-xxxx-xxxxx-' + p.slice(10, 12) + '-' + p.charAt(12) : (p ? 'x'.repeat(Math.max(0, p.length - 2)) + p.slice(-2) : '-');
+  }
+  function displayName(r) { return r.fullName || ((r.firstName || '') + ' ' + (r.lastName || '')).trim(); }
+
+  /** เดาหมู่ที่จากชื่อไฟล์ เช่น "สิทธิ์การรักษาพยาบาล ปชก ม.8.xlsx" -> 8 */
+  function detectMoo(fileName) {
+    var s = String(fileName || '');
+    var pats = [/หมู่(?:ที่)?\s*0*(\d{1,2})/, /ม\.\s*0*(\d{1,2})/, /moo\s*0*(\d{1,2})/i, /(?:^|[^A-Za-z])V0*(\d{1,2})(?:[^0-9]|$)/];
+    for (var i = 0; i < pats.length; i++) {
+      var m = s.match(pats[i]);
+      if (m) { var n = Number(m[1]); if (n >= 1 && n <= 99) return n; }
+    }
+    return null;
+  }
+
+  /** ตรวจเบื้องต้นฝั่งหน้าเว็บ (เซิร์ฟเวอร์ตรวจซ้ำอีกครั้งเสมอ) */
+  function localValidate(records) {
+    var seen = {}, res = { total: records.length, badPid: 0, checksum: 0, dup: 0, noName: 0, noRight: 0, issues: [] };
+    records.forEach(function (r) {
+      var why = [];
+      if (!/^\d{13}$/.test(r.pid || '')) { res.badPid++; why.push('เลขประจำตัวประชาชนไม่ครบ 13 หลัก'); }
+      else if (!pidChecksumOk(r.pid)) { res.checksum++; why.push('เลขประจำตัวประชาชนหลักตรวจสอบไม่ถูกต้อง (นำเข้าได้ แต่ติดสถานะไม่สมบูรณ์)'); }
+      if (r.pid && seen[r.pid]) { res.dup++; why.push('ซ้ำกับแถวที่ ' + seen[r.pid]); }
+      else if (r.pid) seen[r.pid] = r._row;
+      var named = r.fullName !== undefined ? String(r.fullName).trim().indexOf(' ') > 0 : (r.firstName && r.lastName);
+      if (!named) { res.noName++; why.push('ไม่มีชื่อ-นามสกุล'); }
+      if (!(r.rightCode || r.mainInscl)) { res.noRight++; why.push('ไม่ระบุสิทธิการรักษา'); }
+      if (why.length && res.issues.length < 100) res.issues.push({ row: r._row, pidMasked: maskPid(r.pid), name: displayName(r), why: why });
+    });
+    return res;
+  }
+  /** สรุปเนื้อหาไฟล์: หมู่บ้าน/ชื่อหมู่บ้าน ประเภทการอยู่ รหัสหน่วยบริการ โรคเรื้อรัง เบอร์โทร */
+  function summarize(records) {
+    var s = { villages: {}, types: {}, hcodes: {}, chronic: {}, phone: 0, rightCodes: {} };
+    records.forEach(function (r) {
+      if (r.moo !== undefined) {
+        var m = String(r.moo).replace(/\D/g, '') || '?';
+        var v = s.villages[m] || (s.villages[m] = { count: 0, names: {} });
+        v.count++;
+        if (r.villageName) v.names[r.villageName] = (v.names[r.villageName] || 0) + 1;
+      }
+      if (r.typeArea !== undefined) { var t = /^[1-5]$/.test(r.typeArea) ? r.typeArea : 'X'; s.types[t] = (s.types[t] || 0) + 1; }
+      if (r.hcode) s.hcodes[r.hcode] = (s.hcodes[r.hcode] || 0) + 1;
+      if (r.chronic) r.chronic.split(',').forEach(function (c) { s.chronic[c] = (s.chronic[c] || 0) + 1; });
+      if (r.phone && String(r.phone).split(/[,;\/]|\s{2,}/).some(function (p) {
+        var d = p.replace(/\D/g, ''); return (/^0[689]\d{8}$/.test(d) || /^0[2-7]\d{7}$/.test(d)) && !/^(\d)\1+$/.test(d.slice(1));
+      })) s.phone++;
+      var rc = r.rightCode || r.mainInscl || '';
+      s.rightCodes[rc] = (s.rightCodes[rc] || 0) + 1;
+    });
+    Object.keys(s.villages).forEach(function (m) {
+      var n = s.villages[m].names, best = '', c = 0;
+      Object.keys(n).forEach(function (k) { if (n[k] > c) { best = k; c = n[k]; } });
+      s.villages[m].name = best;
+    });
+    return s;
+  }
+
+  return { RULES: RULES, LABELS: LABELS, REQUIRED: REQUIRED, FORMAT_FIELDS: FORMAT_FIELDS, mapHeaders: mapHeaders,
+    findHeaderRow: findHeaderRow, missingRequired: missingRequired, detectFormat: detectFormat, columnsOf: columnsOf,
+    toRecords: toRecords, cellToString: cellToString, detectMoo: detectMoo, localValidate: localValidate, summarize: summarize,
+    pidChecksumOk: pidChecksumOk, maskPid: maskPid, displayName: displayName };
+})();
+</script>
+
+<!-- ============================== APPLICATION ============================== -->
+<script>
+'use strict';
+/* ==========================================================================
+   ตั้งค่าการเชื่อมต่อ Google Apps Script
+   นำ URL ของ Web App (ลงท้ายด้วย /exec) มาวางแทนข้อความด้านล่าง
+   ========================================================================== */
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxanrMulMzddSoqcKNKdfRboWg-I8PrZX6Vsd4t_gWiYdR3ZdYlbL_1QNdULLu5q7g0/exec";
+const API_TIMEOUT_MS = 45000;        // คำขอทั่วไป
+const IMPORT_TIMEOUT_MS = 330000;    // นำเข้า Excel (Apps Script จำกัด 6 นาที)
+
+/* ---------------- constants ---------------- */
+const ROLE_LABEL = { ADMIN: 'ผู้ดูแลระบบ', STAFF: 'เจ้าหน้าที่', VILLAGE_USER: 'อสม.' };
+const GROUP_COLOR = { UC: '#1baf7a', SSS: '#2a78d6', OFC: '#eb6834', LGO: '#6250d6', OTHER: '#eda100', NONE: '#e34948' };
+const GROUP_ORDER = ['UC', 'SSS', 'OFC', 'LGO', 'OTHER', 'NONE'];
+const MAIN_COLOR = { UCS: '#1baf7a', WEL: '#0f766e', SSS: '#2a78d6', OFC: '#eb6834', LGO: '#6250d6', PVT: '#eda100', NRD: '#e87ba4', '-': '#e34948' };
+const AGE_LABEL = { '0-5': '0–5 ปี', '6-14': '6–14 ปี', '15-59': '15–59 ปี', '60+': '60 ปีขึ้นไป', UNKNOWN: 'ไม่ระบุ' };
+const AGE_ORDER = ['0-5', '6-14', '15-59', '60+', 'UNKNOWN'];
+const FLAG_ORDER = ['INCOMPLETE', 'NOT_FOUND', 'INVALID_PID', 'NO_NAME', 'NO_RIGHT', 'RIGHT_UNVERIFIED', 'NO_SUBRIGHT', 'SUB_EXPIRED',
+  'EXPIRING_SOON', 'AGE_RIGHT_MISMATCH', 'OUTSIDE_UNIT', 'RIGHT_MISMATCH', 'DECEASED'];
+const ERR_FLAGS = ['INCOMPLETE', 'NOT_FOUND', 'INVALID_PID', 'NO_NAME', 'NO_RIGHT', 'RIGHT_UNVERIFIED'];
+const KNOWN_MAINS = ['UCS', 'WEL', 'SSS', 'OFC', 'LGO', 'PVT', 'NRD'];
+/* ประเภทการอยู่อาศัย (TYPEAREA) */
+const TYPE_ORDER = ['1', '2', '3', '4', '5', 'X'];
+const TYPE_COLOR = { '1': '#2a78d6', '2': '#eda100', '3': '#6250d6', '4': '#94a3b8', '5': '#e87ba4', X: '#cbd5e1' };
+const TYPE_FILTERS = [['ALL', 'ทั้งหมด'], ['LIVE', 'อาศัยอยู่จริง (Type 1+3)'], ['1', 'Type 1'], ['2', 'Type 2'], ['3', 'Type 3']];
+const CHRONIC_ORDER = ['DM', 'HT', 'IHD', 'ST', 'CA', 'AM', 'ANC'];
+const CHRONIC_COLOR = '#eb6834';
+
+const S = {
+  token: null, profile: null, view: null, overview: null, village: {}, currentVillage: null, ovType: 'ALL', vType: 'ALL',
+  search: null, lastSearch: null, imp: {}, users: null, reportType: null, lastActivity: Date.now()
+};
+
+/* ---------------- icons ---------------- */
+const ICONS = {
+  logo: '<svg viewBox="0 0 48 48" width="30" height="30" fill="none"><path d="M24 4l16 6v12c0 10.5-6.8 18.6-16 22-9.2-3.4-16-11.5-16-22V10l16-6z" fill="#fff" fill-opacity=".95"/><path d="M24 4l16 6v12c0 10.5-6.8 18.6-16 22V4z" fill="#d1fae5"/><rect x="20.5" y="14" width="7" height="20" rx="2" fill="#059669"/><rect x="14" y="20.5" width="20" height="7" rx="2" fill="#059669"/><circle cx="35" cy="34" r="6" fill="#f97316"/><path d="M32.5 34l1.8 1.8 3.4-3.6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  dashboard: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  home: '<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  report: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 17v-3M12 17v-6M16 17v-2"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/>',
+  history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  menu: '<path d="M3 6h18M3 12h18M3 18h18"/>',
+  x: '<path d="M18 6L6 18M6 6l12 12"/>',
+  print: '<path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  alert: '<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/>',
+  check: '<path d="M20 6L9 17l-5-5"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M17.9 17.9A10 10 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9 9 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',
+  refresh: '<path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  trend: '<path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/>'
+};
+function ico(name, cls) {
+  if (name === 'logo') return ICONS.logo;
+  return '<svg class="ico ' + (cls || '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
+}
+
+/* ---------------- helpers ---------------- */
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+function esc(v) {
+  return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+const fmt = n => Number(n || 0).toLocaleString('th-TH');
+const pct = (n, t) => t ? (Number(n || 0) * 100 / t).toFixed(1) + '%' : '0.0%';
+const pctNum = (n, t) => t ? Number(n || 0) * 100 / t : 0;
+const TH_MONTH = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+function thDate(s, withTime) {
+  const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);
+  if (!m) return esc(s || '-');
+  const y = Number(m[1]) + 543;
+  return Number(m[3]) + ' ' + TH_MONTH[Number(m[2]) - 1] + ' ' + y + (withTime !== false && m[4] ? ' ' + m[4] + ':' + m[5] + ' น.' : '');
+}
+function nowThai() {
+  const d = new Date();
+  return d.getDate() + ' ' + TH_MONTH[d.getMonth()] + ' ' + (d.getFullYear() + 543) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' น.';
+}
+function store(k, v) { try { if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { /* storage blocked */ } }
+function load(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+function perms() { return (S.profile && S.profile.permissions) || {}; }
+function cfg() { return (S.profile && S.profile.config) || {}; }
+function groupLabel(code) { const g = (cfg().groups || []).find(x => x.code === code); return g ? g.label : code; }
+function flagLabel(f) {
+  if (f === 'INCOMPLETE') return 'ข้อมูลไม่สมบูรณ์ (รวม)';
+  const d = (cfg().flags || {})[f];
+  return d ? d.label + (f === 'EXPIRING_SOON' ? ' (ภายใน ' + (cfg().expiringDays || 90) + ' วัน)' : '') : f;
+}
+function typeShort(t) { const d = (cfg().types || {})[t]; return d ? d.short : (t === 'X' || !t ? 'ไม่ระบุ' : 'Type ' + t); }
+function typeLong(t) { const d = (cfg().types || {})[t]; return d ? d.label : typeShort(t); }
+function typeFilterLabel(code) {
+  if (!code || code === 'ALL') return 'ทุกประเภทการอยู่อาศัย';
+  if (code === 'LIVE') return 'อาศัยอยู่จริง (Type 1+3)';
+  return typeLong(code);
+}
+function chronicName(c, short) {
+  const d = (cfg().chronic || []).find(x => x.code === c);
+  const n = d ? d.name : c;
+  return short ? n.replace(/\s*\(.*\)$/, '') : n;
+}
+function personName(it) { return ((it.prefix || '') + (it.firstName || '-') + ' ' + (it.lastName || '')).trim(); }
+function hasTypeData(tc) { return ['1', '2', '3', '4', '5'].some(t => (tc || {})[t]); }
+function chronicChips(list) {
+  return String(list || '').split(',').filter(Boolean).map(c => '<span class="tag tag-o" title="' + esc(chronicName(c)) + '">' + esc(c) + '</span>').join('');
+}
+function villageById(id) { return ((S.profile && S.profile.villages) || []).find(v => v.id === id); }
+function villageLabel(id) { const v = villageById(id); return v ? v.label : (id || '-'); }
+
+/* ---------------- UI feedback ---------------- */
+let loadingCount = 0;
+function showLoading(on, text) {
+  loadingCount = Math.max(0, loadingCount + (on ? 1 : -1));
+  $('#loading').hidden = loadingCount === 0;
+  if (on && text) $('#loading-text').textContent = text;
+}
+function toast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  el.innerHTML = ico(type === 'ok' ? 'check' : type === 'err' || type === 'warn' ? 'alert' : 'info') + '<div>' + esc(msg) + '</div>';
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), type === 'err' ? 7000 : 4200);
+}
+function openModal(html, opts) {
+  opts = opts || {};
+  const root = $('#modal-root');
+  const wrap = document.createElement('div');
+  wrap.className = 'modal';
+  wrap.innerHTML = '<div class="modal-card ' + (opts.wide ? 'wide' : '') + '" role="dialog" aria-modal="true">' + html + '</div>';
+  if (!opts.locked) wrap.addEventListener('click', e => { if (e.target === wrap) wrap.remove(); });
+  root.appendChild(wrap);
+  return wrap;
+}
+function closeModal(el) { const m = el ? el.closest('.modal') : $('#modal-root .modal:last-child'); if (m) m.remove(); }
+function modalHead(title, closable) {
+  return '<div class="modal-h"><h3>' + esc(title) + '</h3><div class="spacer"></div>' +
+    (closable === false ? '' : '<button class="btn btn-icon btn-ghost" data-action="close-modal" aria-label="ปิด">' + ico('x') + '</button>') + '</div>';
+}
+function confirmBox(title, msg, okText, danger) {
+  return new Promise(res => {
+    const m = openModal(modalHead(title) + '<div class="modal-b">' + msg + '</div><div class="modal-f">' +
+      '<button class="btn" data-r="0">ยกเลิก</button><button class="btn ' + (danger ? 'btn-orange' : 'btn-primary') + '" data-r="1">' + esc(okText || 'ยืนยัน') + '</button></div>');
+    m.addEventListener('click', e => {
+      const b = e.target.closest('[data-r]');
+      if (b) { m.remove(); res(b.dataset.r === '1'); }
+      if (e.target.closest('[data-action="close-modal"]')) res(false);
+    });
+  });
+}
+
+/* ==========================================================================
+   API LAYER
+   - เปิดจากภายนอก: fetch POST (Content-Type text/plain = simple request ไม่มี CORS preflight)
+     Apps Script ตอบกลับผ่าน redirect ไป googleusercontent.com ซึ่งอนุญาต CORS
+   - เปิดผ่าน Apps Script (doGet): ใช้ google.script.run.apiRouter
+   ========================================================================== */
+class AppError extends Error { constructor(code, message) { super(message); this.code = code; } }
+function inGas() { return typeof google !== 'undefined' && google.script && google.script.run; }
+function apiConfigured() { return inGas() || /^https:\/\/script\.google(usercontent)?\.com\/.+/.test(GAS_API_URL); }
+
+async function api(action, params, opt) {
+  opt = opt || {};
+  const timeout = opt.timeout || API_TIMEOUT_MS;
+  const body = JSON.stringify({ action: action, token: S.token, params: params || {}, clientInfo: (navigator.userAgent || '').slice(0, 160) });
+  let res;
+  if (inGas()) {
+    res = await new Promise((resolve, reject) => {
+      const t = setTimeout(() => reject(new AppError('TIMEOUT', 'เซิร์ฟเวอร์ตอบสนองช้าเกินไป กรุณาลองใหม่')), timeout);
+      google.script.run
+        .withSuccessHandler(s => { clearTimeout(t); try { resolve(JSON.parse(s)); } catch (e) { reject(new AppError('BAD_RESPONSE', 'ข้อมูลตอบกลับไม่ถูกต้อง')); } })
+        .withFailureHandler(e => { clearTimeout(t); reject(new AppError('NETWORK', 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ: ' + (e && e.message || e))); })
+        .apiRouter(body);
+    });
+  } else {
+    if (!apiConfigured()) throw new AppError('CONFIG', 'ยังไม่ได้ตั้งค่า GAS_API_URL ในไฟล์ index.html');
+    if (!navigator.onLine) throw new AppError('OFFLINE', 'อุปกรณ์ไม่ได้เชื่อมต่ออินเทอร์เน็ต');
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), timeout);
+    try {
+      const r = await fetch(GAS_API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body, redirect: 'follow', signal: ctl.signal, cache: 'no-store' });
+      if (!r.ok) throw new AppError('NETWORK', 'เซิร์ฟเวอร์ตอบกลับผิดพลาด (HTTP ' + r.status + ')');
+      const txt = await r.text();
+      try { res = JSON.parse(txt); }
+      catch (e) { throw new AppError('BAD_RESPONSE', 'เซิร์ฟเวอร์ไม่ได้ตอบกลับเป็น JSON — ตรวจสอบการ Deploy (Execute as: Me, Who has access: Anyone) และ URL ที่ลงท้ายด้วย /exec'); }
+    } catch (e) {
+      if (e.name === 'AbortError') throw new AppError('TIMEOUT', 'หมดเวลารอการตอบกลับจากเซิร์ฟเวอร์ (' + Math.round(timeout / 1000) + ' วินาที) กรุณาลองใหม่');
+      if (e instanceof AppError) throw e;
+      throw new AppError('NETWORK', 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตหรือ URL ของ Web App');
+    } finally { clearTimeout(t); }
+  }
+  if (!res || res.ok !== true) {
+    const er = (res && res.error) || { code: 'UNKNOWN', message: 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ' };
+    if ((er.code === 'UNAUTHORIZED' || er.code === 'SESSION_EXPIRED') && action !== 'login') { endSession(er.message); }
+    else if (er.code === 'PASSWORD_CHANGE_REQUIRED') { showChangePassword(true); }
+    throw new AppError(er.code, er.message);
+  }
+  return res.data;
+}
+/** เรียก API พร้อม loading + toast error */
+async function call(action, params, opt) {
+  opt = opt || {};
+  if (!opt.silent) showLoading(true, opt.text);
+  try { return await api(action, params, opt); }
+  catch (e) {
+    if (!opt.quietError && !['UNAUTHORIZED', 'SESSION_EXPIRED', 'PASSWORD_CHANGE_REQUIRED'].includes(e.code)) toast(e.message, 'err');
+    throw e;
+  } finally { if (!opt.silent) showLoading(false); }
+}
+
+/* ==========================================================================
+   AUTH
+   ========================================================================== */
+async function doLogin(ev) {
+  ev.preventDefault();
+  const errEl = $('#login-error');
+  errEl.hidden = true;
+  const btn = $('#login-btn');
+  btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ...';
+  try {
+    const d = await api('login', { username: $('#lg-user').value.trim(), password: $('#lg-pass').value });
+    S.token = d.token; S.profile = d.profile;
+    store('shc_token', d.token);
+    $('#lg-pass').value = '';
+    startApp();
+  } catch (e) {
+    errEl.innerHTML = ico('alert') + '<div>' + esc(e.message) + '</div>';
+    errEl.hidden = false;
+  } finally { btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ'; }
+}
+async function logout() {
+  if (!(await confirmBox('ออกจากระบบ', 'ต้องการออกจากระบบใช่หรือไม่?', 'ออกจากระบบ'))) return;
+  try { await call('logout', {}, { text: 'กำลังออกจากระบบ...' }); } catch (e) { /* ignore */ }
+  endSession('ออกจากระบบเรียบร้อยแล้ว', true);
+}
+function endSession(msg, ok) {
+  S.token = null; S.profile = null; S.overview = null; S.village = {}; S.users = null; S.imp = {};
+  store('shc_token', null);
+  Object.keys(CH).forEach(k => { CH[k].destroy(); delete CH[k]; });
+  $('#modal-root').innerHTML = '';
+  $('#app').hidden = true; $('#login-view').hidden = false;
+  document.body.classList.remove('nav-open');
+  if (msg) {
+    const el = $('#login-error');
+    el.className = 'alert ' + (ok ? 'alert-ok' : 'alert-warn');
+    el.innerHTML = ico(ok ? 'check' : 'info') + '<div>' + esc(msg) + '</div>';
+    el.hidden = false;
+    setTimeout(() => { el.className = 'alert alert-error'; }, 8000);
+  }
+}
+function showChangePassword(forced) {
+  if ($('#cp-modal')) return;
+  const min = cfg().minPasswordLength || 8;
+  const m = openModal(modalHead(forced ? 'กรุณาตั้งรหัสผ่านใหม่' : 'เปลี่ยนรหัสผ่าน', !forced) +
+    '<form id="cp-modal" class="modal-b" style="display:flex;flex-direction:column;gap:14px">' +
+    (forced ? '<div class="alert alert-info">' + ico('lock') + '<div>เพื่อความปลอดภัย ต้องเปลี่ยนรหัสผ่านตั้งต้นก่อนใช้งานระบบ</div></div>' : '') +
+    '<div class="field"><label>รหัสผ่านปัจจุบัน</label><input class="input" type="password" name="old" required autocomplete="current-password"></div>' +
+    '<div class="field"><label>รหัสผ่านใหม่</label><input class="input" type="password" name="np" required minlength="' + min + '" autocomplete="new-password">' +
+    '<span class="xs muted">อย่างน้อย ' + min + ' ตัว ต้องมีทั้งตัวอักษรภาษาอังกฤษและตัวเลข และไม่มีชื่อผู้ใช้อยู่ในรหัสผ่าน</span></div>' +
+    '<div class="field"><label>ยืนยันรหัสผ่านใหม่</label><input class="input" type="password" name="np2" required autocomplete="new-password"></div>' +
+    '<div class="alert alert-error" id="cp-err" hidden></div>' +
+    '<div class="row" style="justify-content:flex-end">' + (forced ? '<button type="button" class="btn" data-action="logout-now">ออกจากระบบ</button>' : '') +
+    '<button class="btn btn-primary" type="submit">บันทึกรหัสผ่านใหม่</button></div></form>', { locked: forced });
+  $('#cp-modal', m).addEventListener('submit', async e => {
+    e.preventDefault();
+    const f = e.target, err = $('#cp-err', m);
+    err.hidden = true;
+    if (f.np.value !== f.np2.value) { err.textContent = 'รหัสผ่านใหม่และการยืนยันไม่ตรงกัน'; err.hidden = false; return; }
+    try {
+      const d = await api('changePassword', { oldPassword: f.old.value, newPassword: f.np.value });
+      S.profile = d.profile;
+      m.remove();
+      toast('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว', 'ok');
+      if (forced) startApp();
+    } catch (ex) { err.textContent = ex.message; err.hidden = false; }
+  });
+}
+
+/* ==========================================================================
+   APP SHELL / ROUTER
+   ========================================================================== */
+const VIEWS = {
+  overview: { title: 'Dashboard ภาพรวมตำบล', icon: 'dashboard', sec: 'main', ok: p => p.viewOverview, render: renderOverviewView },
+  village: { title: 'Dashboard หมู่บ้าน', icon: 'home', sec: 'main', ok: () => true, render: renderVillageView },
+  search: { title: 'ค้นหาข้อมูลประชาชน', icon: 'search', sec: 'main', ok: () => true, render: renderSearchView },
+  reports: { title: 'รายงาน', icon: 'report', sec: 'main', ok: () => true, render: renderReportsView },
+  import: { title: 'นำเข้าข้อมูล Excel', icon: 'upload', sec: 'admin', ok: p => p.importExcel, render: renderImportView },
+  history: { title: 'ประวัติการนำเข้าข้อมูล', icon: 'history', sec: 'admin', ok: p => p.viewImportHistory, render: renderHistoryView },
+  users: { title: 'จัดการผู้ใช้งาน', icon: 'users', sec: 'admin', ok: p => p.manageUsers, render: renderUsersView },
+  audit: { title: 'ประวัติการเข้าใช้งาน', icon: 'shield', sec: 'admin', ok: p => p.viewAudit, render: renderAuditView },
+  settings: { title: 'ตั้งค่าระบบ', icon: 'settings', sec: 'admin', ok: p => p.editConfig, render: renderSettingsView },
+  account: { title: 'บัญชีของฉัน', icon: 'user', sec: 'me', ok: () => true, render: renderAccountView }
+};
+function startApp() {
+  const p = S.profile;
+  if (!p) return;
+  $('#login-view').hidden = true; $('#app').hidden = false;
+  $('#login-error').hidden = true;
+  $('#u-name').textContent = p.displayName || p.username;
+  $('#u-role').textContent = ROLE_LABEL[p.role] || p.role;
+  $('#u-avatar').textContent = (p.displayName || p.username || 'U').trim().charAt(0).toUpperCase();
+  const tv = $('#top-village');
+  if (p.role === 'VILLAGE_USER' && p.village) { tv.hidden = false; tv.innerHTML = ico('home', 'ico-sm') + esc(p.village.label); }
+  else tv.hidden = true;
+  $('#sb-foot').innerHTML = esc(cfg().unitName || 'รพ.สต.บึงเนียม') + ' · v' + esc(cfg().appVersion || '1.0');
+  const label = { main: 'เมนูหลัก', admin: 'ผู้ดูแลระบบ', me: 'บัญชี' };
+  let html = '', sec = '';
+  Object.keys(VIEWS).forEach(k => {
+    const v = VIEWS[k];
+    if (!v.ok(perms())) return;
+    if (v.sec !== sec) { sec = v.sec; html += '<div class="nav-sec">' + label[sec] + '</div>'; }
+    const title = k === 'village' && p.role === 'VILLAGE_USER' ? 'Dashboard หมู่บ้านของฉัน' : v.title;
+    html += '<a data-action="go" data-view="' + k + '" id="nav-' + k + '">' + ico(v.icon) + '<span>' + esc(title) + '</span></a>';
+  });
+  html += '<a data-action="logout">' + ico('logout') + '<span>ออกจากระบบ</span></a>';
+  $('#nav').innerHTML = html;
+  if (p.mustChangePassword) { showChangePassword(true); return; }
+  const hash = (location.hash || '').replace('#', '');
+  go(VIEWS[hash] && VIEWS[hash].ok(perms()) ? hash : (perms().viewOverview ? 'overview' : 'village'));
+}
+function go(view, opts) {
+  if (!VIEWS[view] || !VIEWS[view].ok(perms())) view = perms().viewOverview ? 'overview' : 'village';
+  S.view = view;
+  $$('#content > section').forEach(s => { s.hidden = s.id !== 'view-' + view; });
+  $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.view === view));
+  $('#page-title').textContent = view === 'village' && S.profile.role === 'VILLAGE_USER' ? 'Dashboard หมู่บ้านของฉัน' : VIEWS[view].title;
+  try { history.replaceState(null, '', '#' + view); } catch (e) { /* file:// may block */ }
+  document.body.classList.remove('nav-open');
+  window.scrollTo(0, 0);
+  VIEWS[view].render(opts || {});
+}
+
+/* ==========================================================================
+   CHARTS
+   ========================================================================== */
+const CH = {};
+function chart(id, config) {
+  if (CH[id]) { CH[id].destroy(); delete CH[id]; }
+  const el = document.getElementById(id);
+  if (!el || !window.Chart) return;
+  CH[id] = new Chart(el, config);
+}
+if (window.Chart) {
+  Chart.defaults.font.family = "'Prompt','Kanit',sans-serif";
+  Chart.defaults.font.size = 13;
+  Chart.defaults.color = '#475569';
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.pointStyle = 'rectRounded';
+  Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.cornerRadius = 10;
+  Chart.defaults.maintainAspectRatio = false;
+}
+const centerText = {
+  id: 'centerText',
+  afterDraw(c, args, o) {
+    if (!o || !o.text) return;
+    const m = c.getDatasetMeta(0);
+    if (!m || !m.data || !m.data[0]) return;
+    const x = m.data[0].x, y = m.data[0].y, ctx = c.ctx;
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#0f172a'; ctx.font = "600 26px Kanit, sans-serif"; ctx.fillText(o.text, x, y - 8);
+    ctx.fillStyle = '#64748b'; ctx.font = "13px Prompt, sans-serif"; ctx.fillText(o.sub || '', x, y + 16);
+    ctx.restore();
+  }
+};
+function pctTooltip(total) {
+  return { callbacks: { label: c => ' ' + c.label + ': ' + fmt(c.parsed) + ' คน (' + pct(c.parsed, total) + ')' } };
+}
+function doughnutGroups(id, groups, total) {
+  const codes = GROUP_ORDER.filter(g => groups[g]);
+  chart(id, {
+    type: 'doughnut',
+    data: { labels: codes.map(groupLabel), datasets: [{ data: codes.map(g => groups[g]), backgroundColor: codes.map(g => GROUP_COLOR[g]), borderColor: '#fff', borderWidth: 2, hoverOffset: 6 }] },
+    options: { cutout: '64%', plugins: { legend: { position: 'bottom' }, tooltip: pctTooltip(total), centerText: { text: fmt(total), sub: 'คน' } } },
+    plugins: [centerText]
+  });
+}
+function pieMains(id, mains, lookups, total) {
+  const codes = Object.keys(mains).sort((a, b) => mains[b] - mains[a]);
+  chart(id, {
+    type: 'pie',
+    data: { labels: codes.map(c => c === '-' ? 'ไม่ระบุสิทธิ' : c + ' · ' + ((lookups.main || {})[c] || c)), datasets: [{ data: codes.map(c => mains[c]), backgroundColor: codes.map(c => MAIN_COLOR[c] || GROUP_COLOR[(lookups.mainGroup || {})[c]] || '#94a3b8'), borderColor: '#fff', borderWidth: 2 }] },
+    options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 12 }, generateLabels: chartPctLegend(total) } }, tooltip: pctTooltip(total) } }
+  });
+}
+function chartPctLegend(total) {
+  return function (c) {
+    const base = Chart.overrides.doughnut.plugins.legend.labels.generateLabels(c);
+    const ds = c.data.datasets[0].data;
+    base.forEach((l, i) => { l.text = String(l.text).replace(/^(\S+) · /, '$1 ').slice(0, 46) + ' — ' + pct(ds[i], total); });
+    return base;
+  };
+}
+const barOpts = (extra) => Object.assign({
+  plugins: { legend: { display: false } },
+  scales: { x: { grid: { display: false }, ticks: { font: { size: 12 } } }, y: { beginAtZero: true, grid: { color: '#eef2f1' }, border: { display: false }, ticks: { precision: 0 } } }
+}, extra || {});
+
+/* ==========================================================================
+   SHARED RENDER PIECES
+   ========================================================================== */
+function kpiCards(T, extra) {
+  const total = T.TOTAL.ALL || 0, G = T.GROUP || {};
+  let h = '<div class="kpis">' +
+    '<div class="kpi hero"><div class="lbl">' + ico('users', 'ico-sm') + 'ประชากรทั้งหมด</div><div class="val num">' + fmt(total) + '<small>คน</small></div><div class="sub">' + esc(extra || '') + '</div></div>';
+  GROUP_ORDER.forEach(g => {
+    const n = G[g] || 0;
+    if (g === 'NONE' && !n) return;
+    h += '<div class="kpi" style="--c:' + GROUP_COLOR[g] + '"><div class="lbl"><span class="dot"></span>' + esc(groupLabel(g)) + '</div>' +
+      '<div class="val num">' + fmt(n) + '<small>' + pct(n, total) + '</small></div><div class="bar"><i style="width:' + pctNum(n, total).toFixed(1) + '%"></i></div></div>';
+  });
+  return h + '</div>';
+}
+/** การ์ดแถวที่ 2: ครัวเรือน ประเภทการอยู่อาศัย และกลุ่มโรคเรื้อรัง */
+function typeKpiCards(d) {
+  const tc = d.typeCounts || {}, all = TYPE_ORDER.reduce((s, t) => s + (tc[t] || 0), 0), C = (d.totals || {}).CHRONIC || {};
+  const total = d.totals.TOTAL.ALL || 0;
+  const card = (label, n, small, sub, color, w) => '<div class="kpi" style="--c:' + color + '"><div class="lbl"><span class="dot"></span>' + esc(label) + '</div>' +
+    '<div class="val num">' + fmt(n) + '<small>' + esc(small) + '</small></div>' + (w !== undefined ? '<div class="bar"><i style="width:' + w.toFixed(1) + '%"></i></div>' : '<div class="sub">' + esc(sub || '') + '</div>') + '</div>';
+  let h = '<div class="kpis mt">' + card('ครัวเรือน (บ้านเลขที่)', d.households || 0, 'หลังคาเรือน', typeFilterLabel(d.typeArea), '#0284c7');
+  if (hasTypeData(tc)) ['1', '2', '3'].forEach(t => { h += card(typeShort(t) + (t === '2' ? ' (ไม่อยู่จริง)' : t === '3' ? ' (ทะเบียนนอกเขต)' : ' (อยู่จริง)'), tc[t] || 0, pct(tc[t], all), '', TYPE_COLOR[t], pctNum(tc[t], all)); });
+  ['DM', 'HT'].forEach(c => { if (C[c]) h += card(chronicName(c, true), C[c], pct(C[c], total), '', CHRONIC_COLOR, pctNum(C[c], total)); });
+  return h + '</div>';
+}
+function typeSeg(cur, action, tc) {
+  if (!hasTypeData(tc)) return '';
+  return '<div class="filter-bar no-print"><span class="lbl">ประเภทการอยู่อาศัย:</span><div class="seg" role="group" aria-label="ประเภทการอยู่อาศัย">' +
+    TYPE_FILTERS.map(t => '<button type="button" class="' + (t[0] === (cur || 'ALL') ? 'on' : '') + '" data-action="' + action + '" data-type="' + t[0] + '" aria-pressed="' + (t[0] === (cur || 'ALL')) + '">' + esc(t[1]) + '</button>').join('') + '</div></div>';
+}
+function chronicChart(id, T) {
+  const C = T.CHRONIC || {}, codes = CHRONIC_ORDER.filter(c => C[c]), total = T.TOTAL.ALL || 0;
+  if (!codes.length) { const el = document.getElementById(id); if (el) el.parentNode.innerHTML = '<div class="empty">ไม่มีข้อมูลโรคเรื้อรังในไฟล์ที่นำเข้า</div>'; return; }
+  chart(id, { type: 'bar', data: { labels: codes.map(c => chronicName(c, true)), datasets: [{ label: 'จำนวน', data: codes.map(c => C[c]), backgroundColor: CHRONIC_COLOR, borderRadius: 4, maxBarThickness: 22 }] },
+    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { title: i => chronicName(codes[i[0].dataIndex]), label: c2 => ' ' + fmt(c2.parsed.x) + ' คน (' + pct(c2.parsed.x, total) + ' ของประชากร)' } } },
+      scales: { x: { beginAtZero: true, grid: { color: '#eef2f1' }, ticks: { precision: 0 } }, y: { grid: { display: false } } } } });
+}
+function typeStackChart(id, villages) {
+  const types = TYPE_ORDER.filter(t => villages.some(v => (v.types || {})[t]));
+  if (!types.some(t => t !== 'X')) { const el = document.getElementById(id); if (el) el.parentNode.innerHTML = '<div class="empty">ไฟล์ที่นำเข้ายังไม่มีข้อมูลประเภทการอยู่อาศัย (นำเข้าไฟล์ JHCIS Type 1,2,3)</div>'; return; }
+  chart(id, { type: 'bar',
+    data: { labels: villages.map(v => 'ม.' + v.moo), datasets: types.map(t => ({ label: typeShort(t), data: villages.map(v => (v.types || {})[t] || 0), backgroundColor: TYPE_COLOR[t], borderColor: '#fff', borderWidth: { top: 2 }, maxBarThickness: 46 })) },
+    options: { plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index', callbacks: { title: i => villages[i[0].dataIndex].label, label: c2 => { const tt = TYPE_ORDER.reduce((s, t) => s + ((villages[c2.dataIndex].types || {})[t] || 0), 0); return ' ' + typeLong(types[c2.datasetIndex]) + ': ' + fmt(c2.parsed.y) + ' (' + pct(c2.parsed.y, tt) + ')'; } } } },
+      scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, grid: { color: '#eef2f1' }, border: { display: false } } } } });
+}
+function osmTableHtml(list, villageId) {
+  if (!list || !list.length || (list.length === 1 && !list[0].name)) return '<div class="empty">ไฟล์ที่นำเข้ายังไม่มีข้อมูล อสม. ผู้รับผิดชอบ</div>';
+  return '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>อสม. ผู้รับผิดชอบ (ตาม JHCIS)</th><th class="r">ประชากรที่ดูแล</th><th class="r">ต้องติดตาม</th><th class="no-print"></th></tr></thead><tbody>' +
+    list.map((o, i) => '<tr><td class="muted">' + (i + 1) + '</td><td>' + (o.name ? '<b>' + esc(o.name) + '</b>' : '<span class="muted">ไม่ระบุ อสม.</span>') + '</td><td class="r num">' + fmt(o.total) + '</td><td class="r num">' +
+      (o.followUp ? '<span class="badge b-warn">' + fmt(o.followUp) + '</span>' : '0') + '</td><td class="no-print">' +
+      (o.name ? '<button class="btn btn-sm" data-action="osm-search" data-osm="' + esc(o.name) + '" data-village="' + esc(villageId || '') + '">รายชื่อ</button>' : '') + '</td></tr>').join('') +
+    '</tbody></table></div>';
+}
+function insightsHtml(list, villageId, typeArea) {
+  if (!list || !list.length) return '<div class="empty">ไม่มีข้อสังเกต</div>';
+  return '<div class="insights">' + list.map(i => {
+    const params = i.params ? Object.assign({ typeArea: typeArea && typeArea !== 'ALL' ? typeArea : '' }, i.params) : null;
+    return '<div class="ins ' + esc(i.level) + '"><div class="ic">' + ico(i.level === 'good' ? 'check' : i.level === 'warn' ? 'alert' : 'info', 'ico-sm') + '</div><div>' + esc(i.text) + '</div>' +
+      (params ? '<button class="btn btn-sm act no-print" data-action="insight-search" data-params="' + esc(JSON.stringify(params)) + '" data-village="' + esc(villageId || '') + '">ดูรายชื่อ</button>' : '') + '</div>';
+  }).join('') + '</div>';
+}
+function flagsHtml(T, villageId, typeArea) {
+  const F = Object.assign({}, T.FLAG || {}, { INCOMPLETE: (T.STATUS || {}).INCOMPLETE || 0 });
+  const items = FLAG_ORDER.filter(f => F[f]);
+  if (!items.length) return '<div class="empty">' + ico('check') + '<div>ข้อมูลครบถ้วน ไม่พบรายการที่ต้องติดตาม</div></div>';
+  return '<div class="flag-list">' + items.map(f => {
+    const warn = ERR_FLAGS.includes(f);
+    return '<div class="flag-item"><span class="badge ' + (warn ? 'b-err' : 'b-warn') + '">' + (warn ? 'ไม่สมบูรณ์' : 'ติดตาม') + '</span><span class="t">' + esc(flagLabel(f)) + '</span><span class="n num">' + fmt(F[f]) + '</span>' +
+      '<button class="btn btn-sm no-print" data-action="flag-search" data-flag="' + f + '" data-village="' + esc(villageId || '') + '" data-type="' + esc(typeArea && typeArea !== 'ALL' ? typeArea : '') + '">ดู</button></div>';
+  }).join('') + '</div>';
+}
+function mainTableHtml(T, lookups) {
+  const total = T.TOTAL.ALL || 0;
+  const codes = Object.keys(T.MAIN || {}).sort((a, b) => T.MAIN[b] - T.MAIN[a]);
+  return '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>รหัส</th><th>ประเภทสิทธิหลัก</th><th class="hide-sm">กลุ่ม</th><th class="r">จำนวน (คน)</th><th class="r">ร้อยละ</th><th class="hide-sm">สัดส่วน</th></tr></thead><tbody>' +
+    codes.map(c => {
+      const g = (lookups.mainGroup || {})[c] || 'OTHER', n = T.MAIN[c];
+      return '<tr><td><b>' + esc(c === '-' ? '—' : c) + '</b></td><td>' + esc(lookups.main[c] || c) + '</td><td class="hide-sm"><span class="swatch" style="background:' + GROUP_COLOR[g] + '"></span>' + esc(groupLabel(g)) + '</td><td class="r num">' + fmt(n) + '</td><td class="r num">' + pct(n, total) + '</td>' +
+        '<td class="hide-sm"><div class="minibar"><span><i style="width:' + pctNum(n, total).toFixed(1) + '%;background:' + GROUP_COLOR[g] + '"></i></span></div></td></tr>';
+    }).join('') + '</tbody><tfoot><tr><td></td><td>รวม</td><td class="hide-sm"></td><td class="r num">' + fmt(total) + '</td><td class="r num">100%</td><td class="hide-sm"></td></tr></tfoot></table></div>';
+}
+function subTableHtml(T, lookups) {
+  const total = T.TOTAL.ALL || 0;
+  const keys = Object.keys(T.SUB || {}).sort((a, b) => T.SUB[b] - T.SUB[a]);
+  return '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>สิทธิหลัก</th><th>รหัสย่อย</th><th>ชื่อสิทธิย่อย</th><th class="r">จำนวน</th><th class="r">ร้อยละ</th></tr></thead><tbody>' +
+    keys.map(k => { const p = k.split('|'); return '<tr><td>' + esc(p[0] === '-' ? '—' : p[0]) + '</td><td>' + esc(p[1] === '-' ? '—' : p[1]) + '</td><td>' + esc(lookups.sub[k] || '') + '</td><td class="r num">' + fmt(T.SUB[k]) + '</td><td class="r num">' + pct(T.SUB[k], total) + '</td></tr>'; }).join('') +
+    '</tbody></table></div>';
+}
+function ageGenderHtml(T) {
+  const total = T.TOTAL.ALL || 0, G = T.GENDER || {};
+  return '<div class="row" style="gap:8px;margin-bottom:10px">' + Object.keys(G).map(g => '<span class="chip ' + (g === 'หญิง' ? 'chip-orange' : g === 'ชาย' ? 'chip-blue' : 'chip-gray') + '">' + esc(g) + ' <b class="num">' + fmt(G[g]) + '</b> (' + pct(G[g], total) + ')</span>').join('') + '</div>';
+}
+function ageChart(id, T) {
+  const A = T.AGE || {}, codes = AGE_ORDER.filter(a => A[a]);
+  chart(id, { type: 'bar', data: { labels: codes.map(a => AGE_LABEL[a]), datasets: [{ label: 'จำนวน', data: codes.map(a => A[a]), backgroundColor: codes.map(a => a === '60+' ? '#f97316' : '#10b981'), borderRadius: 4, maxBarThickness: 46 }] },
+    options: barOpts({ plugins: { legend: { display: false }, tooltip: pctTooltip(T.TOTAL.ALL || 0) } }) });
+}
+function lastImportText(li) {
+  if (!li) return 'ยังไม่มีการนำเข้าข้อมูล';
+  return 'นำเข้าล่าสุด ' + thDate(li.timestamp) + (li.fileName ? ' · ' + li.fileName : '');
+}
+
+/* ==========================================================================
+   VIEW: OVERVIEW (ADMIN / STAFF)
+   ========================================================================== */
+async function renderOverviewView(opts) {
+  const el = $('#view-overview');
+  if (opts.type) S.ovType = opts.type;
+  if (!S.overview || opts.refresh || S.overview.typeArea !== S.ovType) {
+    el.innerHTML = '<div class="kpis">' + '<div class="skeleton"></div>'.repeat(4) + '</div><div class="skeleton mt" style="height:320px"></div>';
+    try { S.overview = await call('getDashboardData', { typeArea: S.ovType }, { silent: true }); }
+    catch (e) { el.innerHTML = errorBox(e, 'overview'); return; }
+  }
+  const d = S.overview, T = d.totals, total = T.TOTAL.ALL || 0, c = cfg();
+  const scopeTxt = d.scopeType === 'ALL' ? 'ทั้ง ' + d.villages.length + ' หมู่บ้าน' : 'ตามขอบเขตสิทธิ์ ' + d.villages.length + ' หมู่บ้าน';
+  el.innerHTML =
+    '<div class="page-hero"><div><h1>ภาพรวมสิทธิหลักประกันสุขภาพ ต.' + esc(c.tambon || 'บึงเนียม') + '</h1>' +
+    '<p>' + esc(scopeTxt) + ' · ' + esc(d.typeLabel || '') + ' · ' + esc(lastImportText(d.lastImport)) + '</p></div><div class="spacer"></div>' +
+    '<button class="btn no-print" data-action="refresh-overview">' + ico('refresh', 'ico-sm') + 'รีเฟรช</button>' +
+    '<button class="btn btn-blue no-print" data-action="go" data-view="reports">' + ico('report', 'ico-sm') + 'รายงาน</button></div>' +
+    typeSeg(d.typeArea, 'ov-type', d.typeCounts) +
+    kpiCards(T, 'มีข้อมูล ' + d.villagesWithData + '/' + d.villages.length + ' หมู่บ้าน') + typeKpiCards(d) +
+    '<div class="grid g-2 mt">' +
+      '<div class="card"><div class="card-h"><h3>สัดส่วนกลุ่มสิทธิ</h3><span class="sub">Doughnut · ร้อยละของประชากรทั้งหมด</span></div><div class="chart-box"><canvas id="c-ov-group"></canvas></div></div>' +
+      '<div class="card"><div class="card-h"><h3>สัดส่วนสิทธิหลักประกันสุขภาพ (รายสิทธิหลัก)</h3><span class="sub">Pie · MAININSCL</span></div><div class="chart-box"><canvas id="c-ov-main"></canvas></div></div>' +
+    '</div>' +
+    '<div class="grid g-32 mt">' +
+      '<div class="card"><div class="card-h"><h3>จำนวนประชากรรายหมู่บ้าน</h3><span class="sub">Bar · 12 หมู่บ้าน</span></div><div class="chart-box"><canvas id="c-ov-vil"></canvas></div></div>' +
+      '<div class="card"><div class="card-h"><h3>หมู่บ้านมากที่สุด / น้อยที่สุด</h3></div>' + maxMinHtml(d, total) +
+        '<div class="card-h mt"><h3>คุณภาพข้อมูลและรายการที่ต้องติดตาม</h3><span class="sub">คลิก "ดู" เพื่อเปิดรายชื่อ</span></div>' + flagsHtml(T, '', d.typeArea) + '</div>' +
+    '</div>' +
+    '<div class="card mt"><div class="card-h"><h3>ประเภทสิทธิแยกตามหมู่บ้าน</h3><span class="sub">Stacked Bar · จำนวนคนในแต่ละกลุ่มสิทธิ</span></div><div class="chart-box tall"><canvas id="c-ov-stack"></canvas></div></div>' +
+    '<div class="grid g-32 mt">' +
+      '<div class="card"><div class="card-h"><h3>ประชากรตามประเภทการอยู่อาศัยรายหมู่บ้าน</h3><span class="sub">Stacked Bar · Type 1 / 2 / 3 (ทุกประเภท)</span></div><div class="chart-box"><canvas id="c-ov-type"></canvas></div></div>' +
+      '<div class="card"><div class="card-h"><h3>กลุ่มโรคเรื้อรัง/กลุ่มเป้าหมาย</h3><span class="sub">จำนวนคน · ' + esc(typeFilterLabel(d.typeArea)) + '</span></div><div class="chart-box"><canvas id="c-ov-chronic"></canvas></div></div>' +
+    '</div>' +
+    '<div class="grid g-23 mt">' +
+      '<div class="card"><div class="card-h"><h3>กลุ่มอายุและเพศ</h3></div>' + ageGenderHtml(T) + '<div class="chart-box short"><canvas id="c-ov-age"></canvas></div></div>' +
+      '<div class="card"><div class="card-h"><h3>สรุปข้อมูลสำคัญเพื่อการบริหารจัดการ</h3></div>' + insightsHtml(d.insights, '', d.typeArea) + '</div>' +
+    '</div>' +
+    '<div class="card mt"><div class="card-h"><h3>ตารางสรุปข้อมูลรายหมู่บ้าน</h3><div class="spacer"></div><button class="btn btn-sm no-print" data-action="export-village-table">' + ico('download', 'ico-sm') + 'Excel</button></div>' + villageTableHtml(d, total) + '</div>' +
+    '<div class="grid g-2 mt">' +
+      '<div class="card"><div class="card-h"><h3>ตารางเปรียบเทียบประเภทสิทธิหลัก</h3></div>' + mainTableHtml(T, d.lookups) + '</div>' +
+      '<div class="card"><div class="card-h"><h3>สิทธิย่อย (SUBINSCL)</h3></div>' + subTableHtml(T, d.lookups) + '</div>' +
+    '</div>';
+  doughnutGroups('c-ov-group', T.GROUP, total);
+  pieMains('c-ov-main', T.MAIN, d.lookups, total);
+  chart('c-ov-vil', { type: 'bar', data: { labels: d.villages.map(v => 'ม.' + v.moo), datasets: [{ label: 'ประชากร', data: d.villages.map(v => v.total), backgroundColor: d.villages.map(v => d.maxVillage && v.id === d.maxVillage.id ? '#047857' : '#34d399'), borderRadius: 4, maxBarThickness: 42 }] },
+    options: barOpts({ plugins: { legend: { display: false }, tooltip: { callbacks: { title: i => d.villages[i[0].dataIndex].label, label: c2 => ' ' + fmt(c2.parsed.y) + ' คน (' + pct(c2.parsed.y, total) + ' ของทั้งหมด)' } } } }) });
+  chart('c-ov-stack', { type: 'bar',
+    data: { labels: d.villages.map(v => 'ม.' + v.moo), datasets: GROUP_ORDER.filter(g => T.GROUP[g]).map(g => ({ label: groupLabel(g), data: d.villages.map(v => (v.groups || {})[g] || 0), backgroundColor: GROUP_COLOR[g], borderColor: '#fff', borderWidth: { top: 2 }, maxBarThickness: 46 })) },
+    options: { plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index', callbacks: { title: i => d.villages[i[0].dataIndex].label, label: c2 => ' ' + c2.dataset.label + ': ' + fmt(c2.parsed.y) + ' (' + pct(c2.parsed.y, d.villages[c2.dataIndex].total) + ')' } } },
+      scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, grid: { color: '#eef2f1' }, border: { display: false } } } } });
+  ageChart('c-ov-age', T);
+  typeStackChart('c-ov-type', d.villages);
+  chronicChart('c-ov-chronic', T);
+}
+function maxMinHtml(d, total) {
+  if (!d.maxVillage) return '<div class="empty">ยังไม่มีข้อมูล</div>';
+  return '<div class="mm"><div class="box max"><span class="xs muted">ประชากรมากที่สุด</span><b class="num">' + fmt(d.maxVillage.total) + ' คน</b><span class="small">' + esc(d.maxVillage.label) + ' · ' + pct(d.maxVillage.total, total) + '</span></div>' +
+    '<div class="box min"><span class="xs muted">ประชากรน้อยที่สุด</span><b class="num">' + fmt(d.minVillage.total) + ' คน</b><span class="small">' + esc(d.minVillage.label) + ' · ' + pct(d.minVillage.total, total) + '</span></div></div>' +
+    (d.villagesWithData < d.villages.length ? '<p class="xs muted" style="margin:8px 0 0">* เปรียบเทียบเฉพาะหมู่บ้านที่นำเข้าข้อมูลแล้ว (' + d.villagesWithData + ' หมู่บ้าน)</p>' : '');
+}
+function villageTableHtml(d, total) {
+  const gs = GROUP_ORDER;
+  const sum = {}; gs.forEach(g => { sum[g] = 0; }); let inc = 0, hh = 0;
+  const rows = d.villages.map(v => {
+    gs.forEach(g => { sum[g] += (v.groups || {})[g] || 0; }); inc += v.incomplete; hh += v.households || 0;
+    return '<tr class="click" data-action="open-village" data-village="' + esc(v.id) + '"><td><b>ม.' + v.moo + '</b></td><td class="vname">' + esc(v.name || '-') +
+      (v.staffName ? '<div class="xs muted">จนท. ' + esc(v.staffName) + '</div>' : '') + '</td><td class="r num">' + (v.total ? fmt(v.total) : '<span class="badge b-gray">ยังไม่มีข้อมูล</span>') + '</td><td class="r num">' + pct(v.total, total) + '</td>' +
+      '<td class="r num hide-sm">' + fmt(v.households || 0) + '</td>' +
+      gs.map(g => '<td class="r num hide-sm">' + fmt((v.groups || {})[g] || 0) + '</td>').join('') + '<td class="r num">' + (v.incomplete ? '<span class="badge b-err">' + fmt(v.incomplete) + '</span>' : '0') + '</td></tr>';
+  }).join('');
+  return '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>หมู่</th><th>ชื่อหมู่บ้าน</th><th class="r">ประชากร</th><th class="r">ร้อยละ</th><th class="r hide-sm">ครัวเรือน</th>' + gs.map(g => '<th class="r hide-sm"><span class="swatch" style="background:' + GROUP_COLOR[g] + '"></span>' + esc(groupLabel(g)) + '</th>').join('') + '<th class="r">ไม่สมบูรณ์</th></tr></thead><tbody>' + rows +
+    '</tbody><tfoot><tr><td></td><td>รวม</td><td class="r num">' + fmt(total) + '</td><td class="r num">100%</td><td class="r num hide-sm">' + fmt(hh) + '</td>' + gs.map(g => '<td class="r num hide-sm">' + fmt(sum[g]) + '</td>').join('') + '<td class="r num">' + fmt(inc) + '</td></tr></tfoot></table></div>';
+}
+function errorBox(e, retryView) {
+  return '<div class="card"><div class="alert alert-error">' + ico('alert') + '<div><b>โหลดข้อมูลไม่สำเร็จ</b><br>' + esc(e.message) + '</div></div>' +
+    (retryView ? '<div style="margin-top:12px"><button class="btn btn-primary" data-action="retry" data-view="' + retryView + '">' + ico('refresh', 'ico-sm') + 'ลองใหม่</button></div>' : '') + '</div>';
+}
+
+/* ==========================================================================
+   VIEW: VILLAGE DASHBOARD
+   ========================================================================== */
+async function renderVillageView(opts) {
+  const el = $('#view-village'), p = S.profile;
+  const isVU = p.role === 'VILLAGE_USER';
+  let vid = isVU ? p.villageId : (opts.villageId || S.currentVillage || (p.villages[0] && p.villages[0].id));
+  // อสม.: ไม่ส่ง villageId (เซิร์ฟเวอร์ใช้ VillageID จากบัญชี)
+  S.currentVillage = vid;
+  const selector = isVU ? '' : '<div class="field no-print" style="min-width:220px"><label>เลือกหมู่บ้าน</label><select class="input" id="vil-select">' +
+    p.villages.map(v => '<option value="' + esc(v.id) + '"' + (v.id === vid ? ' selected' : '') + '>' + esc(v.label) + '</option>').join('') + '</select></div>';
+  if (opts.type) S.vType = opts.type;
+  const ck = vid + '|' + S.vType;
+  if (!S.village[ck] || opts.refresh) {
+    el.innerHTML = '<div class="skeleton" style="height:130px"></div><div class="kpis mt">' + '<div class="skeleton"></div>'.repeat(4) + '</div>';
+    const params = { typeArea: S.vType };
+    if (!isVU) params.villageId = vid;
+    try { S.village[ck] = await call('getVillageDashboard', params, { silent: true }); }
+    catch (e) { el.innerHTML = errorBox(e, 'village'); return; }
+  }
+  const d = S.village[ck], T = d.totals, total = T.TOTAL.ALL || 0, v = d.village, c = cfg();
+  const vfor = isVU ? '' : vid;
+  el.innerHTML =
+    '<div class="village-banner"><span class="badge-orange">' + esc(isVU ? 'อสม. ' + v.label : ROLE_LABEL[p.role]) + '</span>' +
+      '<div class="eyebrow">SMART HEALTH COVERAGE</div><h1>' + esc(v.label) + '</h1>' +
+      '<p>ข้อมูลสิทธิหลักประกันสุขภาพประชาชน · ต.' + esc(c.tambon) + ' อ.' + esc(c.amphoe) + ' จ.' + esc(c.province) + '</p>' +
+      '<div class="banner-meta">' + (v.staffName ? '<span>จนท. ผู้รับผิดชอบ: ' + esc(v.staffName) + '</span>' : '') +
+        '<span>' + fmt(total) + ' คน · ' + fmt(d.households) + ' หลังคาเรือน</span><span>' + esc(d.typeLabel || '') + '</span></div>' +
+      '<p class="small" style="opacity:.8;margin-top:8px">' + esc(lastImportText(d.lastImport)) + '</p></div>' +
+    '<div class="row no-print" style="margin-bottom:16px;align-items:flex-end">' + selector + '<div class="spacer"></div>' +
+      '<button class="btn" data-action="refresh-village">' + ico('refresh', 'ico-sm') + 'รีเฟรช</button>' +
+      '<button class="btn btn-blue" data-action="village-report">' + ico('print', 'ico-sm') + 'รายงานหมู่บ้าน</button>' +
+      '<button class="btn btn-primary" data-action="village-search">' + ico('search', 'ico-sm') + 'ค้นหาประชาชนในหมู่บ้าน</button></div>' +
+    (total ? '' : '<div class="alert alert-warn" style="margin-bottom:16px">' + ico('info') + '<div>ยังไม่มีข้อมูลประชากรของหมู่บ้านนี้ในระบบ' + (perms().importExcel ? ' — นำเข้าไฟล์ Excel ได้ที่เมนู "นำเข้าข้อมูล Excel"' : ' กรุณาติดต่อ รพ.สต.') + '</div></div>') +
+    typeSeg(d.typeArea, 'v-type', d.typeCounts) +
+    kpiCards(T, 'ประชากรในหมู่บ้าน') + typeKpiCards(d) +
+    '<div class="grid g-2 mt">' +
+      '<div class="card"><div class="card-h"><h3>สัดส่วนกลุ่มสิทธิ</h3><span class="sub">ร้อยละของประชากรในหมู่บ้าน</span></div><div class="chart-box"><canvas id="c-v-group"></canvas></div></div>' +
+      '<div class="card"><div class="card-h"><h3>ประเภทสิทธิย่อย (10 อันดับแรก)</h3></div><div class="chart-box"><canvas id="c-v-sub"></canvas></div></div>' +
+    '</div>' +
+    '<div class="grid g-2 mt">' +
+      '<div class="card"><div class="card-h"><h3>รายการที่ต้องติดตาม</h3><span class="sub">คลิก "ดู" เพื่อเปิดรายชื่อ</span></div>' + flagsHtml(T, vfor, d.typeArea) + '</div>' +
+      '<div class="card"><div class="card-h"><h3>สรุปข้อมูลสำคัญ</h3></div>' + insightsHtml(d.insights, vfor, d.typeArea) + '</div>' +
+    '</div>' +
+    '<div class="grid g-2 mt">' +
+      '<div class="card"><div class="card-h"><h3>ความรับผิดชอบของ อสม.</h3><span class="sub">จำนวนประชากรที่ดูแล และรายการที่ต้องติดตาม</span></div>' + osmTableHtml(d.osm, vfor) + '</div>' +
+      '<div class="card"><div class="card-h"><h3>กลุ่มโรคเรื้อรัง/กลุ่มเป้าหมาย</h3><span class="sub">ใช้วางแผนเยี่ยมบ้าน</span></div><div class="chart-box short"><canvas id="c-v-chronic"></canvas></div>' +
+        (perms().viewSensitive && Object.keys(T.CHRONIC || {}).length ? '<div class="row mt" style="gap:6px">' + CHRONIC_ORDER.filter(cc => (T.CHRONIC || {})[cc]).map(cc => '<button class="btn btn-sm" data-action="chronic-search" data-chronic="' + cc + '" data-village="' + esc(vfor) + '">' + esc(chronicName(cc, true)) + ' ' + fmt(T.CHRONIC[cc]) + '</button>').join('') + '</div>' : '') + '</div>' +
+    '</div>' +
+    '<div class="grid g-23 mt">' +
+      '<div class="card"><div class="card-h"><h3>กลุ่มอายุและเพศ</h3></div>' + ageGenderHtml(T) + '<div class="chart-box short"><canvas id="c-v-age"></canvas></div></div>' +
+      '<div class="card"><div class="card-h"><h3>จำนวนและร้อยละแยกตามประเภทสิทธิหลัก</h3></div>' + mainTableHtml(T, d.lookups) + '</div>' +
+    '</div>' +
+    '<div class="card mt"><div class="card-h"><h3>สิทธิย่อยทั้งหมด</h3></div>' + subTableHtml(T, d.lookups) + '</div>';
+  if (!isVU) $('#vil-select').addEventListener('change', e => go('village', { villageId: e.target.value }));
+  chronicChart('c-v-chronic', T);
+  doughnutGroups('c-v-group', T.GROUP, total);
+  const subs = Object.keys(T.SUB || {}).sort((a, b) => T.SUB[b] - T.SUB[a]).slice(0, 10);
+  chart('c-v-sub', { type: 'bar', data: { labels: subs.map(k => { const n = d.lookups.sub[k] || k; return n.length > 30 ? n.slice(0, 29) + '…' : n; }),
+    datasets: [{ data: subs.map(k => T.SUB[k]), backgroundColor: subs.map(k => GROUP_COLOR[d.lookups.mainGroup[k.split('|')[0]] || 'NONE']), borderRadius: 4, maxBarThickness: 22 }] },
+    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { title: i => d.lookups.sub[subs[i[0].dataIndex]], label: c2 => ' ' + fmt(c2.parsed.x) + ' คน (' + pct(c2.parsed.x, total) + ')' } } },
+      scales: { x: { beginAtZero: true, grid: { color: '#eef2f1' }, ticks: { precision: 0 } }, y: { grid: { display: false }, ticks: { font: { size: 12 } } } } } });
+  ageChart('c-v-age', T);
+}
+
+/* ==========================================================================
+   VIEW: SEARCH
+   ========================================================================== */
+function defaultSearch() { return { q: '', pid: '', villageId: '', group: '', mainInscl: '', subInscl: '', flag: '', gender: '', ageGroup: '', typeArea: '', chronic: '', osm: '', houseNo: '', page: 1, pageSize: 50, sort: 'name' }; }
+const SEARCH_KEYS = ['q', 'pid', 'villageId', 'group', 'mainInscl', 'subInscl', 'flag', 'gender', 'ageGroup', 'typeArea', 'chronic', 'osm', 'houseNo', 'sort'];
+function osmNames() {
+  const set = {};
+  Object.keys(S.village || {}).forEach(k => ((S.village[k] || {}).osm || []).forEach(o => { if (o.name) set[o.name] = 1; }));
+  return Object.keys(set).sort((a, b) => a.localeCompare(b, 'th'));
+}
+function renderSearchView(opts) {
+  const el = $('#view-search'), p = S.profile, isVU = p.role === 'VILLAGE_USER';
+  if (!S.search || opts.reset) S.search = defaultSearch();
+  if (opts.preset) Object.assign(S.search, defaultSearch(), opts.preset);
+  const s = S.search;
+  const opt = (v, t, cur) => '<option value="' + esc(v) + '"' + (String(v) === String(cur) ? ' selected' : '') + '>' + esc(t) + '</option>';
+  el.innerHTML =
+    '<div class="page-hero"><div><h1>ค้นหาและตรวจสอบสิทธิประชาชน</h1><p>' + (isVU ? 'แสดงเฉพาะประชาชนใน ' + esc(p.village ? p.village.label : '') : 'ค้นหาได้เฉพาะหมู่บ้านในขอบเขตสิทธิ์ของท่าน') + ' · เลขประจำตัวประชาชนแสดงแบบปิดบัง</p></div></div>' +
+    '<form class="card" id="search-form"><div class="filters">' +
+      '<div class="field wide"><label>ชื่อ นามสกุล หรือ HN</label><input class="input" name="q" maxlength="60" value="' + esc(s.q) + '" placeholder="พิมพ์ชื่อ/นามสกุล หรือ HN (ตัวเลข)"></div>' +
+      (perms().searchPid ? '<div class="field wide"><label>เลขประจำตัวประชาชน (13 หลัก ค้นหาแบบตรงตัว)</label><input class="input" name="pid" inputmode="numeric" maxlength="17" autocomplete="off" value="' + esc(s.pid) + '" placeholder="x-xxxx-xxxxx-xx-x"></div>' : '') +
+      (isVU ? '' : '<div class="field"><label>หมู่บ้าน</label><select class="input" name="villageId">' + opt('', 'ทุกหมู่บ้านในสิทธิ์', s.villageId) + p.villages.map(v => opt(v.id, v.label, s.villageId)).join('') + '</select></div>') +
+      '<div class="field"><label>บ้านเลขที่</label><input class="input" name="houseNo" maxlength="40" value="' + esc(s.houseNo) + '" placeholder="เช่น 12/1"></div>' +
+      '<div class="field"><label>ประเภทการอยู่อาศัย</label><select class="input" name="typeArea">' + opt('', 'ทุกประเภท', s.typeArea) + opt('LIVE', 'อาศัยอยู่จริง (Type 1+3)', s.typeArea) + ['1', '2', '3'].map(t => opt(t, typeLong(t), s.typeArea)).join('') + '</select></div>' +
+      '<div class="field"><label>กลุ่มสิทธิ</label><select class="input" name="group">' + opt('', 'ทุกกลุ่มสิทธิ', s.group) + GROUP_ORDER.map(g => opt(g, groupLabel(g), s.group)).join('') + '</select></div>' +
+      '<div class="field"><label>สิทธิหลัก</label><select class="input" name="mainInscl">' + opt('', 'ทุกสิทธิหลัก', s.mainInscl) + KNOWN_MAINS.map(m => opt(m, m, s.mainInscl)).join('') + '</select></div>' +
+      '<div class="field"><label>รหัสสิทธิย่อย/รหัสสิทธิ์</label><input class="input" name="subInscl" maxlength="10" value="' + esc(s.subInscl) + '" placeholder="เช่น 89, 77, S1"></div>' +
+      '<div class="field"><label>สถานะข้อมูล/รายการติดตาม</label><select class="input" name="flag">' + opt('', 'ทุกสถานะ', s.flag) + opt('COMPLETE_ONLY', 'ข้อมูลสมบูรณ์', s.flag) + FLAG_ORDER.map(f => opt(f, flagLabel(f), s.flag)).join('') + '</select></div>' +
+      (perms().viewSensitive ? '<div class="field"><label>โรคเรื้อรัง/กลุ่มเป้าหมาย</label><select class="input" name="chronic">' + opt('', 'ทั้งหมด', s.chronic) + opt('ANY', 'มีโรคเรื้อรังอย่างน้อย 1 โรค', s.chronic) + CHRONIC_ORDER.map(c2 => opt(c2, chronicName(c2), s.chronic)).join('') + '</select></div>' : '') +
+      '<div class="field"><label>อสม. ผู้รับผิดชอบ</label><input class="input" name="osm" maxlength="80" list="osm-list" value="' + esc(s.osm) + '" placeholder="ชื่อ อสม."><datalist id="osm-list">' + osmNames().map(n => '<option value="' + esc(n) + '">').join('') + '</datalist></div>' +
+      '<div class="field"><label>เพศ</label><select class="input" name="gender">' + opt('', 'ทั้งหมด', s.gender) + opt('ชาย', 'ชาย', s.gender) + opt('หญิง', 'หญิง', s.gender) + '</select></div>' +
+      '<div class="field"><label>กลุ่มอายุ</label><select class="input" name="ageGroup">' + opt('', 'ทุกกลุ่มอายุ', s.ageGroup) + AGE_ORDER.map(a => opt(a, AGE_LABEL[a], s.ageGroup)).join('') + '</select></div>' +
+      '<div class="field"><label>เรียงตาม</label><select class="input" name="sort">' + opt('name', 'ชื่อ', s.sort) + opt('house', 'บ้านเลขที่ (สำหรับเยี่ยมบ้าน)', s.sort) + opt('age', 'อายุ (มาก→น้อย)', s.sort) + (isVU ? '' : opt('village', 'หมู่บ้าน', s.sort)) + '</select></div>' +
+    '</div><div class="row" style="margin-top:14px"><button class="btn btn-primary" type="submit">' + ico('search', 'ico-sm') + 'ค้นหา</button>' +
+      '<button class="btn" type="button" data-action="clear-search">ล้างตัวกรอง</button><div class="spacer"></div>' +
+      (perms().exportPerson ? '<button class="btn" type="button" data-action="export-search">' + ico('download', 'ico-sm') + 'ส่งออก Excel</button>' : '') + '</div></form>' +
+    '<div id="search-results"></div>';
+  $('#search-form').addEventListener('submit', e => { e.preventDefault(); readSearchForm(); S.search.page = 1; runSearch(); });
+  runSearch();
+}
+function readSearchForm() {
+  const f = $('#search-form'), s = S.search;
+  SEARCH_KEYS.forEach(k => { if (f[k]) s[k] = f[k].value.trim(); });
+}
+function searchParams() {
+  const s = Object.assign({}, S.search);
+  const p = { q: s.q, villageId: s.villageId, group: s.group, mainInscl: s.mainInscl, subInscl: s.subInscl.toUpperCase(), gender: s.gender, ageGroup: s.ageGroup,
+    typeArea: s.typeArea, osm: s.osm, houseNo: s.houseNo, page: s.page, pageSize: s.pageSize, sort: s.sort };
+  if (s.chronic && perms().viewSensitive) p.chronic = s.chronic;
+  if (s.pid) p.pid = s.pid.replace(/\D/g, '');
+  if (s.flag === 'COMPLETE_ONLY') p.status = 'COMPLETE'; else if (s.flag) p.flag = s.flag;
+  if (S.profile.role === 'VILLAGE_USER') delete p.villageId;
+  return p;
+}
+async function runSearch() {
+  const box = $('#search-results');
+  if (!box) return;
+  const p = searchParams();
+  if (p.pid !== undefined && p.pid.length !== 13) { box.innerHTML = '<div class="alert alert-warn mt">' + ico('info') + '<div>เลขประจำตัวประชาชนต้องมี 13 หลัก</div></div>'; return; }
+  box.innerHTML = '<div class="skeleton mt" style="height:240px"></div>';
+  let d;
+  try { d = await call('searchPopulation', p, { silent: true }); }
+  catch (e) { box.innerHTML = errorBox(e); return; }
+  S.lastSearch = d;
+  const isVU = S.profile.role === 'VILLAGE_USER';
+  const statusBadge = it => it.status === 'INCOMPLETE' ? '<span class="badge b-err">ไม่สมบูรณ์</span>' : it.flags.length ? '<span class="badge b-warn">ติดตาม</span>' : '<span class="badge b-ok">สมบูรณ์</span>';
+  const rightCell = it => it.mainInscl ? '<span class="swatch" style="background:' + (GROUP_COLOR[it.group] || '#94a3b8') + '"></span><b>' + esc(it.mainInscl) + '</b> ' + esc(it.subInscl || '') + ' <span class="small">' + esc(it.subName || '') + '</span>' : '<span class="badge b-err">ไม่พบ/รอตรวจสอบสิทธิ</span>' + (it.subInscl ? ' <span class="small">' + esc(it.subInscl) + '</span>' : '');
+  const typeTag = it => it.typeArea ? '<span class="tag ' + (it.typeArea === '2' ? 'tag-o' : 'tag-b') + '" title="' + esc(typeLong(it.typeArea)) + '">T' + esc(it.typeArea) + '</span>' : '';
+  const ageTxt = it => it.ageYears === '' || it.ageYears === undefined ? '-' : it.ageYears;
+  box.innerHTML =
+    '<div class="result-bar"><span class="chip">' + ico('users', 'ico-sm') + 'พบ <b class="num">' + fmt(d.total) + '</b> รายการ</span>' +
+    '<span class="muted small">หน้า ' + d.page + ' / ' + d.pages + '</span></div>' +
+    (d.total ? '' : '<div class="card empty">ไม่พบข้อมูลตามเงื่อนไข</div>') +
+    (d.total ? '<div class="tbl-wrap search-table"><table class="tbl"><thead><tr><th>#</th><th>ชื่อ - นามสกุล</th><th>เลขประจำตัว (ปิดบัง)</th>' + (isVU ? '' : '<th>หมู่</th>') + '<th>บ้านเลขที่</th><th>Type</th><th>เพศ</th><th class="r">อายุ</th><th>สิทธิ</th><th>อสม.</th><th>สถานะ</th></tr></thead><tbody>' +
+      d.items.map((it, i) => '<tr class="click" data-action="person" data-key="' + esc(it.key) + '"><td class="muted">' + ((d.page - 1) * d.pageSize + i + 1) + '</td><td><b>' + esc(personName(it)) + '</b>' + (it.chronic ? '<div>' + chronicChips(it.chronic) + '</div>' : '') + '</td><td class="num">' + esc(it.pidMasked) + '</td>' +
+        (isVU ? '' : '<td>ม.' + esc(it.moo) + '</td>') + '<td>' + esc(it.houseNo || '-') + '</td><td>' + typeTag(it) + '</td><td>' + esc(it.gender || '-') + '</td><td class="r num">' + esc(ageTxt(it)) + '</td><td>' + rightCell(it) + '</td><td class="small">' + esc(it.osmName || '-') + '</td><td>' + statusBadge(it) + '</td></tr>').join('') +
+      '</tbody></table></div>' +
+      '<div class="person-cards">' + d.items.map(it => '<div class="pcard" data-action="person" data-key="' + esc(it.key) + '"><div class="row"><b>' + esc(personName(it)) + '</b><div class="spacer"></div>' + statusBadge(it) + '</div>' +
+        '<div class="small muted">' + esc(it.pidMasked) + (isVU ? '' : ' · ม.' + esc(it.moo)) + (it.houseNo ? ' · บ้าน ' + esc(it.houseNo) : '') + ' · ' + esc(it.gender || '-') + ' ' + esc(ageTxt(it)) + ' ปี ' + typeTag(it) + '</div>' +
+        '<div class="small" style="margin-top:4px">' + rightCell(it) + '</div>' + (it.chronic || it.osmName ? '<div class="small" style="margin-top:4px">' + chronicChips(it.chronic) + (it.osmName ? '<span class="muted">อสม. ' + esc(it.osmName) + '</span>' : '') + '</div>' : '') + '</div>').join('') + '</div>' +
+      pagerHtml(d) : '');
+}
+function pagerHtml(d) {
+  if (d.pages <= 1) return '';
+  const btn = (p, t, dis, on) => '<button class="btn btn-sm ' + (on ? 'btn-primary' : '') + '" data-action="page" data-page="' + p + '"' + (dis ? ' disabled' : '') + '>' + t + '</button>';
+  let h = '<div class="pager">' + btn(d.page - 1, '‹ ก่อนหน้า', d.page <= 1);
+  const from = Math.max(1, d.page - 2), to = Math.min(d.pages, d.page + 2);
+  for (let i = from; i <= to; i++) h += btn(i, i, false, i === d.page);
+  return h + btn(d.page + 1, 'ถัดไป ›', d.page >= d.pages) + '</div>';
+}
+async function openPerson(key) {
+  let p;
+  try { p = await call('getPersonDetail', { key: key }, { text: 'กำลังโหลดข้อมูล...' }); } catch (e) { return; }
+  const dl = rows => '<dl class="dl">' + rows.filter(r => r).map(r => '<dt>' + esc(r[0]) + '</dt><dd>' + (r[2] ? r[1] : esc(r[1] || '-')) + '</dd>').join('') + '</dl>';
+  const flags = p.flags.length ? p.flags.map(f => '<span class="badge ' + (ERR_FLAGS.includes(f) ? 'b-err' : 'b-warn') + '" style="margin:0 4px 4px 0">' + esc(flagLabel(f)) + '</span>').join('') : '<span class="badge b-ok">ข้อมูลสมบูรณ์</span>';
+  const code = (c, n) => c ? c + (n ? ' · ' + n : '') : '';
+  const srcLabel = { JHCIS: 'JHCIS (รายงานเป้าหมายประชากร)', NHSO: 'สปสช. (ผลตรวจสอบสิทธิ)' };
+  openModal(modalHead('รายละเอียดข้อมูลประชาชน') + '<div class="modal-b">' +
+    '<div class="sec-t">ข้อมูลบุคคล</div>' + dl([['ชื่อ - นามสกุล', personName(p)], ['เลขประจำตัวประชาชน', p.pidMasked + '  (ปิดบังตาม PDPA)'], p.hn ? ['HN (JHCIS)', p.hn] : null, ['เพศ', p.gender],
+      p.birthDate ? ['วันเดือนปีเกิด', p.birthDate] : null, ['อายุ', (p.ageYears !== '' && p.ageYears !== undefined ? p.ageYears + ' ปี' : '') + (p.ageText && !/^\d+$/.test(p.ageText) ? ' (' + p.ageText + ')' : '')],
+      ['หมู่บ้าน', p.villageLabel], p.houseNo ? ['บ้านเลขที่', p.houseNo] : null, p.typeArea ? ['ประเภทการอยู่อาศัย', p.typeLabel] : null, p.phone ? ['เบอร์โทรศัพท์', p.phone] : null]) +
+    '<div class="sec-t">สิทธิการรักษาพยาบาล</div>' + dl([['กลุ่มสิทธิ', '<span class="swatch" style="background:' + (GROUP_COLOR[p.group] || '#94a3b8') + '"></span>' + esc(groupLabel(p.group)), true],
+      ['สิทธิหลัก', p.mainInscl ? code(p.mainInscl, p.mainName) : 'ไม่พบ/รอตรวจสอบ'], ['สิทธิย่อย', p.subInscl ? code(p.subInscl, p.subName) : '-'],
+      p.jhcisCode ? ['รหัสสิทธิใน JHCIS', code(p.jhcisCode, p.jhcisName)] : null,
+      p.nhsoCode ? ['ผลตรวจสอบสิทธิ สปสช.', code(p.nhsoCode, p.nhsoName) + (p.checkDate ? ' (ตรวจเมื่อ ' + p.checkDate + ')' : '')] : null,
+      ['วันหมดอายุสิทธิ/สิทธิย่อย', p.subExpireDate], p.startDate ? ['วันที่เริ่มใช้หน่วยบริการ', p.startDate] : null,
+      p.ageMismatch ? ['ข้อสังเกต', '<span style="color:var(--orange-600)">' + esc(p.ageMismatch) + '</span>', true] : null]) +
+    '<div class="sec-t">หน่วยบริการ</div>' + dl([['หน่วยบริการปฐมภูมิ / ลูกข่าย', code(p.hsub, p.hsubName !== p.hsub ? p.hsubName : '')], ['หน่วยรับส่งต่อ / แม่ข่าย / รพ.ประกันสังคม', code(p.hmain, p.hmainName)],
+      p.hmainOp ? ['หน่วยบริการประจำ', code(p.hmainOp, p.hmainOpName)] : null, p.provinceName ? ['จังหวัดที่ลงทะเบียน', p.provinceName] : null, p.paidModel ? ['รูปแบบการจ่ายเงิน', p.paidModel] : null]) +
+    (p.sensitiveHidden ? '' : '<div class="sec-t">โรคเรื้อรัง/กลุ่มเป้าหมาย</div><div>' + ((p.chronicNames || []).length ? p.chronicNames.map(n => '<span class="badge b-orange" style="margin:0 4px 4px 0">' + esc(n) + '</span>').join('') : '<span class="muted small">ไม่มีข้อมูลโรคเรื้อรังในระบบ</span>') + '</div>') +
+    '<div class="sec-t">ผู้รับผิดชอบ</div>' + dl([['จนท. ผู้รับผิดชอบ', p.staffName], ['อสม. ผู้รับผิดชอบ', p.osmName]]) +
+    '<div class="sec-t">สถานะข้อมูล</div><div>' + flags + '</div>' + (p.remark ? '<p class="small">หมายเหตุ: ' + esc(p.remark) + '</p>' : '') +
+    '<p class="xs muted" style="margin-top:14px">แหล่งข้อมูลล่าสุด: ' + esc(srcLabel[p.source] || p.source) + ' · ปรับปรุง ' + thDate(p.updatedAt) +
+      (p.sensitiveHidden ? ' · ข้อมูลอ่อนไหว (โรคเรื้อรัง เบอร์โทร วันเกิด) ไม่แสดงตามสิทธิ์ของบัญชี' : '') + ' · การเปิดดูข้อมูลรายบุคคลถูกบันทึกในประวัติการใช้งาน</p></div>', { wide: true });
+}
+async function exportSearch() {
+  const p = searchParams(); delete p.page; delete p.pageSize;
+  let d;
+  try { d = await call('exportPopulation', p, { text: 'กำลังเตรียมไฟล์...' }); } catch (e) { return; }
+  const head = ['ลำดับ', 'คำนำหน้า', 'ชื่อ', 'นามสกุล', 'เลขประจำตัว (ปิดบัง)', 'HN', 'หมู่ที่', 'บ้านเลขที่', 'ประเภทการอยู่ (Type)', 'เพศ', 'อายุ (ปี)', 'กลุ่มสิทธิ', 'สิทธิหลัก', 'ชื่อสิทธิหลัก',
+    'สิทธิย่อย/รหัสสิทธิ์', 'ชื่อสิทธิย่อย', 'หน่วยบริการปฐมภูมิ/ลูกข่าย', 'วันหมดอายุสิทธิ'].concat(d.sensitive ? ['โรคเรื้อรัง'] : []).concat(['อสม. ผู้รับผิดชอบ', 'สถานะข้อมูล', 'รายละเอียดสถานะ', 'แหล่งข้อมูล']);
+  const rows = [head];
+  d.items.forEach((it, i) => rows.push([i + 1, it.prefix, it.firstName, it.lastName, it.pidMasked, it.hn, it.moo, it.houseNo, it.typeArea ? 'Type ' + it.typeArea : '', it.gender,
+    it.ageYears === '' ? '' : Number(it.ageYears), groupLabel(it.group), it.mainInscl, it.mainName, it.subInscl, it.subName, it.hsubName, it.subExpireDate]
+    .concat(d.sensitive ? [it.chronicNames || ''] : []).concat([it.osmName, it.status === 'INCOMPLETE' ? 'ไม่สมบูรณ์' : 'สมบูรณ์', it.flagLabels, it.source])));
+  downloadXlsx('รายชื่อประชาชน_' + fileStamp() + '.xlsx', [{ name: 'รายชื่อ', rows: rows }]);
+}
+
+/* ==========================================================================
+   VIEW: IMPORT (ADMIN / STAFF ที่ได้รับอนุญาต)
+   ========================================================================== */
+function renderImportView() {
+  const el = $('#view-import');
+  S.imp = { step: 1 };
+  el.innerHTML =
+    '<div class="page-hero"><div><h1>นำเข้าข้อมูลสิทธิจากไฟล์ Excel</h1><p>รองรับ 2 รูปแบบ (ตรวจอัตโนมัติจากหัวคอลัมน์): ① JHCIS “รายงานเป้าหมายประชากร Type 1,2,3 สิทธิ์การรักษา” ทุกหมู่บ้านในไฟล์เดียว · ② สปสช. ผลตรวจสอบสิทธิ (CheckRightGroupData) 1 ไฟล์ต่อ 1 หมู่บ้าน</p></div></div>' +
+    '<div class="steps" id="imp-steps"></div><div id="imp-body"></div>';
+  impStep1();
+}
+function impSteps(n) {
+  const names = ['เลือกไฟล์', 'ตรวจโครงสร้าง', 'ตรวจกับฐานข้อมูล', 'ผลการนำเข้า'];
+  $('#imp-steps').innerHTML = names.map((t, i) => '<div class="step ' + (i + 1 === n ? 'on' : i + 1 < n ? 'done' : '') + '"><i>' + (i + 1 < n ? '✓' : i + 1) + '</i>' + t + '</div>').join('');
+}
+function impStep1() {
+  impSteps(1);
+  $('#imp-body').innerHTML = '<div class="card"><label class="drop" id="imp-drop"><input type="file" id="imp-file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden>' +
+    '<div class="big">' + ico('upload') + '</div><b class="kanit" style="font-size:18px">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่</b><div class="muted small">ไฟล์ .xlsx หรือ .xls ขนาดไม่เกิน 15 MB</div></label>' +
+    '<div id="imp-fileinfo"></div>' +
+    '<div class="alert alert-info mt">' + ico('shield') + '<div>ระบบจะ <b>สำรองข้อมูลอัตโนมัติ</b> ก่อนนำเข้าทุกครั้ง · เลขประจำตัวประชาชนจะถูกแปลงเป็นรหัสอ้างอิงที่ย้อนกลับไม่ได้ และเก็บเฉพาะเลขที่ปิดบัง · ผู้ที่มีอยู่แล้วจะถูก <b>ปรับปรุง</b> ไม่สร้างซ้ำ</div></div></div>';
+  const inp = $('#imp-file'), drop = $('#imp-drop');
+  inp.addEventListener('change', () => inp.files[0] && pickFile(inp.files[0]));
+  ['dragover', 'dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) pickFile(f); });
+}
+function fileSizeText(n) { return n > 1048576 ? (n / 1048576).toFixed(2) + ' MB' : (n / 1024).toFixed(1) + ' KB'; }
+function pickFile(file) {
+  const box = $('#imp-fileinfo');
+  if (!/\.(xlsx|xls)$/i.test(file.name)) { box.innerHTML = '<div class="alert alert-error mt">' + ico('alert') + '<div>รองรับเฉพาะไฟล์ .xlsx หรือ .xls</div></div>'; return; }
+  if (file.size > 15 * 1048576) { box.innerHTML = '<div class="alert alert-error mt">' + ico('alert') + '<div>ไฟล์มีขนาดใหญ่เกิน 15 MB กรุณาแบ่งไฟล์รายหมู่บ้าน</div></div>'; return; }
+  S.imp.file = file;
+  box.innerHTML = '<div class="file-info"><div class="fi">' + ico('file') + '</div><div style="min-width:0;flex:1"><b style="word-break:break-all">' + esc(file.name) + '</b><div class="small muted">ขนาด ' + fileSizeText(file.size) + ' · แก้ไขล่าสุด ' + esc(new Date(file.lastModified).toLocaleString('th-TH')) + '</div></div>' +
+    '<button class="btn btn-primary" data-action="imp-read">อ่านและตรวจสอบไฟล์ ›</button></div>';
+}
+async function sha256Hex(buf) {
+  try {
+    if (window.crypto && crypto.subtle) {
+      const h = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e) { /* fallthrough */ }
+  return '';
+}
+async function impRead() {
+  if (!window.XLSX) { toast('โหลดไลบรารีอ่าน Excel ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต', 'err'); return; }
+  const file = S.imp.file;
+  showLoading(true, 'กำลังอ่านไฟล์ Excel...');
+  try {
+    const buf = await file.arrayBuffer();
+    S.imp.fileHash = await sha256Hex(buf);
+    const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+    let picked = null;
+    wb.SheetNames.forEach(name => {
+      if (picked) return;
+      const aoa = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: true, defval: '' });
+      const h = SHC_PARSER.findHeaderRow(aoa);
+      if (h) picked = { name: name, aoa: aoa, header: h };
+    });
+    if (!picked) { impStructureError(wb.SheetNames); return; }
+    const records = SHC_PARSER.toRecords(picked.aoa, picked.header.index, picked.header.map);
+    S.imp.sheet = picked.name; S.imp.sheetCount = wb.SheetNames.length; S.imp.map = picked.header.map;
+    S.imp.format = SHC_PARSER.detectFormat(picked.header.map);
+    S.imp.records = records; S.imp.local = SHC_PARSER.localValidate(records); S.imp.summary = SHC_PARSER.summarize(records);
+    S.imp.moo = SHC_PARSER.detectMoo(file.name);
+    impStep2();
+  } catch (e) {
+    toast('อ่านไฟล์ไม่สำเร็จ: ' + e.message, 'err');
+  } finally { showLoading(false); }
+}
+function impStructureError(sheets) {
+  impSteps(2);
+  $('#imp-body').innerHTML = '<div class="card"><div class="alert alert-error">' + ico('alert') + '<div><b>โครงสร้างไฟล์ไม่ถูกต้อง</b><br>ไม่พบหัวตารางที่ต้องการในชีต: ' + esc(sheets.join(', ')) +
+    '<br>คอลัมน์ที่จำเป็น: ' + SHC_PARSER.REQUIRED.map(g => esc(g.label)).join(' · ') +
+    '<br>รองรับไฟล์ JHCIS “รายงานเป้าหมายประชากร Type 1,2,3 สิทธิ์การรักษา” และไฟล์ผลตรวจสอบสิทธิ สปสช. (CheckRightGroupData)</div></div><div class="mt"><button class="btn" data-action="imp-restart">‹ เลือกไฟล์ใหม่</button></div></div>';
+}
+function impFileSummaryHtml(I) {
+  const sm = I.summary || {}, vs = sm.villages || {}, villages = S.profile.villages;
+  const keys = Object.keys(vs).sort((a, b) => Number(a) - Number(b));
+  let h = '';
+  if (keys.length) {
+    h += '<div class="sec-t">หมู่บ้านที่พบในไฟล์ (' + keys.length + ' หมู่บ้าน)</div><div class="vsum">' + keys.map(m => {
+      const sys = villages.find(v => v.moo === Number(m));
+      return '<div>' + (sys ? '<span class="badge b-ok">ม.' + esc(m) + '</span>' : '<span class="badge b-err">ม.' + esc(m) + '</span>') + '<span style="flex:1">' + esc(vs[m].name || (sys ? sys.name : '') || '-') +
+        (sys ? '' : ' <span class="xs" style="color:var(--red)">ไม่อยู่ในขอบเขต</span>') + '</span><b>' + fmt(vs[m].count) + '</b></div>';
+    }).join('') + '</div>';
+  }
+  const tk = Object.keys(sm.types || {});
+  if (tk.length) h += '<div class="sec-t">ประเภทการอยู่อาศัยในไฟล์</div><div class="row" style="gap:6px">' + TYPE_ORDER.filter(t => sm.types[t]).map(t => '<span class="chip"><span class="swatch" style="background:' + TYPE_COLOR[t] + '"></span>' + esc(typeLong(t)) + ' <b class="num">' + fmt(sm.types[t]) + '</b></span>').join('') + '</div>';
+  const ck = CHRONIC_ORDER.filter(c => (sm.chronic || {})[c]);
+  if (ck.length || sm.phone) h += '<div class="sec-t">ข้อมูลสุขภาพและการติดต่อ</div><div class="row" style="gap:6px">' + ck.map(c => '<span class="chip chip-orange">' + esc(chronicName(c, true)) + ' <b class="num">' + fmt(sm.chronic[c]) + '</b></span>').join('') +
+    (sm.phone ? '<span class="chip chip-blue">มีเบอร์โทรที่ใช้ได้ <b class="num">' + fmt(sm.phone) + '</b></span>' : '') + '</div>';
+  const hc = Object.keys(sm.hcodes || {}), unit = cfg().unitCode;
+  if (hc.length && hc.some(x => x !== unit)) h += '<div class="alert alert-warn mt">' + ico('alert') + '<div>พบรหัสหน่วยบริการในไฟล์ที่ไม่ใช่ ' + esc(unit) + ': ' + hc.filter(x => x !== unit).map(x => esc(x) + ' (' + fmt(sm.hcodes[x]) + ' แถว)').join(', ') + ' — กรุณาตรวจสอบว่าเป็นไฟล์ของ ' + esc(cfg().unitName) + '</div></div>';
+  return h;
+}
+function impStep2() {
+  impSteps(2);
+  const I = S.imp, L = I.local, map = I.map, hasMoo = map.moo !== undefined, isJ = I.format === 'JHCIS';
+  const missingReq = SHC_PARSER.missingRequired(map);
+  const villages = S.profile.villages;
+  const autoV = I.moo ? villages.find(v => v.moo === I.moo) : null;
+  const mapped = f => f === 'chronic' ? ['cDM', 'cHT', 'cIHD', 'cST', 'cCA', 'cAM', 'cANC'].some(x => map[x] !== undefined) : f === 'phone' ? ['mobile', 'telPerson', 'telHome'].some(x => map[x] !== undefined) : map[f] !== undefined;
+  const reqF = isJ ? ['pid', 'fullName', 'rightCode'] : ['pid', 'firstName', 'lastName', 'mainInscl'];
+  const maps = SHC_PARSER.FORMAT_FIELDS[I.format].map(f => {
+    const ok = mapped(f), req = reqF.includes(f);
+    return '<div class="' + (ok ? 'ok' : req ? 'req' : 'no') + '">' + (ok ? '✓' : req ? '✗' : '–') + ' ' + esc(SHC_PARSER.LABELS[f]) + '</div>';
+  }).join('');
+  $('#imp-body').innerHTML = '<div class="card">' +
+    '<div class="row"><div class="file-info" style="margin:0;flex:1"><div class="fi">' + ico('file') + '</div><div><b>' + esc(I.file.name) + '</b><div class="small muted">' + fileSizeText(I.file.size) + ' · ชีต "' + esc(I.sheet) + '" (จาก ' + I.sheetCount + ' ชีต) · พบข้อมูล ' + fmt(L.total) + ' แถว</div>' +
+      '<div style="margin-top:6px"><span class="badge ' + (isJ ? 'b-info' : 'b-ok') + '">รูปแบบไฟล์: ' + (isJ ? 'JHCIS รายงานเป้าหมายประชากร Type 1,2,3' : 'สปสช. ผลตรวจสอบสิทธิ (CheckRightGroupData)') + '</span></div></div></div></div>' +
+    '<div class="sec-t">การจับคู่คอลัมน์</div><div class="map-grid">' + maps + '</div>' +
+    (missingReq.length ? '<div class="alert alert-error mt">' + ico('alert') + '<div>ขาดคอลัมน์จำเป็น: ' + missingReq.map(esc).join(' · ') + ' — ไม่สามารถนำเข้าได้</div></div>' : '') +
+    impFileSummaryHtml(I) +
+    '<div class="sec-t">ตรวจสอบเบื้องต้น</div><div class="stat-grid">' +
+      '<div class="stat ok"><b class="num">' + fmt(L.total) + '</b><span>แถวข้อมูล</span></div>' +
+      '<div class="stat ' + (L.badPid ? 'bad' : '') + '"><b class="num">' + fmt(L.badPid) + '</b><span>เลขบัตรไม่ครบ 13 หลัก (ไม่นำเข้า)</span></div>' +
+      '<div class="stat ' + (L.dup ? 'bad' : '') + '"><b class="num">' + fmt(L.dup) + '</b><span>ซ้ำในไฟล์ (ไม่นำเข้า)</span></div>' +
+      '<div class="stat ' + (L.checksum ? 'warn' : '') + '"><b class="num">' + fmt(L.checksum) + '</b><span>เลขบัตรหลักตรวจสอบผิด</span></div>' +
+      '<div class="stat ' + (L.noName ? 'warn' : '') + '"><b class="num">' + fmt(L.noName) + '</b><span>ไม่มีชื่อ-สกุล</span></div>' +
+      '<div class="stat ' + (L.noRight ? 'warn' : '') + '"><b class="num">' + fmt(L.noRight) + '</b><span>ไม่ระบุสิทธิหลัก</span></div></div>' +
+    (L.issues.length ? '<details class="mt"><summary class="small" style="cursor:pointer">ดูรายการที่พบปัญหา (' + L.issues.length + ')</summary><div class="tbl-wrap mt"><table class="tbl"><thead><tr><th>แถว</th><th>เลขประจำตัว</th><th>ชื่อ</th><th>ปัญหา</th></tr></thead><tbody>' +
+      L.issues.map(x => '<tr><td>' + x.row + '</td><td class="num">' + esc(x.pidMasked) + '</td><td>' + esc(x.name || '-') + '</td><td class="small">' + esc(x.why.join(' · ')) + '</td></tr>').join('') + '</tbody></table></div></details>' : '') +
+    '<div class="sec-t">หมู่บ้านของข้อมูลชุดนี้</div>' +
+    (hasMoo ? '<div class="alert alert-info">' + ico('info') + '<div>ไฟล์มีคอลัมน์ "หมู่ที่" ระบบจะใช้หมู่บ้านรายแถว' + (isJ ? ' และเติมชื่อหมู่บ้าน/จนท. ผู้รับผิดชอบจากไฟล์ให้อัตโนมัติ (เฉพาะชื่อหมู่บ้านที่ยังว่าง)' : ' (แถวที่ว่างจะใช้หมู่บ้านที่เลือกด้านล่าง)') + '</div></div>' : '') +
+    '<div class="form-grid"><div class="field"' + (hasMoo && isJ ? ' hidden' : '') + '><label>หมู่บ้าน ' + (hasMoo ? '(สำรอง)' : '<span style="color:var(--red)">*</span>') + '</label><select class="input" id="imp-village"><option value="">— เลือกหมู่บ้าน —</option>' +
+      villages.map(v => '<option value="' + esc(v.id) + '"' + (autoV && autoV.id === v.id && !hasMoo ? ' selected' : '') + '>' + esc(v.label) + '</option>').join('') + '</select>' +
+      (autoV ? '<span class="xs" style="color:var(--em-700)">✓ ตรวจพบ "' + esc(autoV.label) + '" จากชื่อไฟล์ กรุณาตรวจสอบให้ถูกต้อง</span>' : '<span class="xs muted">ไฟล์ไม่มีคอลัมน์หมู่บ้าน กรุณาเลือก</span>') + '</div>' +
+      '<div class="field"><label>ตัวเลือก</label><label class="check"><input type="checkbox" id="imp-deact" checked><span>ปรับสถานะเป็น "ไม่อยู่ในพื้นที่" สำหรับผู้ที่มีในฐานข้อมูลของหมู่บ้านในไฟล์ แต่ไม่มีในไฟล์ใหม่ (ไม่ลบข้อมูล)' +
+        (isJ ? '' : ' — ไฟล์ สปสช. จะไม่ปิดสถานะผู้ที่มีข้อมูลจาก JHCIS') + '</span></label></div></div>' +
+    '<div class="row mt"><button class="btn" data-action="imp-restart">‹ เลือกไฟล์ใหม่</button><div class="spacer"></div>' +
+      '<button class="btn btn-primary" data-action="imp-validate"' + (missingReq.length ? ' disabled' : '') + '>ตรวจสอบกับฐานข้อมูล ›</button></div></div>';
+}
+function impPayload(extra) {
+  const I = S.imp;
+  return Object.assign({ fileName: I.file.name, fileSize: I.file.size, fileHash: I.fileHash, villageId: I.villageId, columns: SHC_PARSER.columnsOf(I.map),
+    deactivateMissing: I.deactivate, records: I.records }, extra || {});
+}
+async function impValidate() {
+  const I = S.imp;
+  I.villageId = $('#imp-village').value;
+  I.deactivate = $('#imp-deact').checked;
+  if (!I.villageId && I.map.moo === undefined) { toast('กรุณาเลือกหมู่บ้านของข้อมูลชุดนี้', 'warn'); return; }
+  try { I.dry = await call('validateImportData', impPayload(), { text: 'กำลังตรวจสอบกับฐานข้อมูล...', timeout: IMPORT_TIMEOUT_MS }); }
+  catch (e) { return; }
+  impStep3();
+}
+function impStatGrid(d) {
+  return '<div class="stat-grid">' +
+    '<div class="stat ok"><b class="num">' + fmt(d.inserted) + '</b><span>เพิ่มใหม่</span></div>' +
+    '<div class="stat up"><b class="num">' + fmt(d.updated) + '</b><span>ปรับปรุงข้อมูล' + (d.moved ? ' (ย้ายหมู่ ' + d.moved + ')' : '') + '</span></div>' +
+    '<div class="stat"><b class="num">' + fmt(d.unchanged) + '</b><span>ไม่เปลี่ยนแปลง</span></div>' +
+    '<div class="stat ' + (d.invalid ? 'bad' : '') + '"><b class="num">' + fmt(d.invalid) + '</b><span>ไม่ผ่านการตรวจสอบ</span></div>' +
+    '<div class="stat ' + (d.deactivated ? 'warn' : '') + '"><b class="num">' + fmt(d.deactivated) + '</b><span>ไม่อยู่ในไฟล์ใหม่ (ปิดสถานะ)</span></div></div>';
+}
+function impStep3() {
+  impSteps(3);
+  const d = S.imp.dry;
+  const fc = d.flagCounts || {};
+  $('#imp-body').innerHTML = '<div class="card">' +
+    (d.duplicateFile ? '<div class="alert alert-warn">' + ico('alert') + '<div><b>ไฟล์นี้เคยนำเข้าสำเร็จแล้ว</b> เมื่อ ' + thDate(d.duplicateFile.timestamp) + ' โดย ' + esc(d.duplicateFile.username) + ' (' + esc(d.duplicateFile.importId) + ')<br>' +
+      '<label class="check" style="margin-top:6px"><input type="checkbox" id="imp-allowdup"><span>ยืนยันนำเข้าซ้ำ (ระบบจะปรับปรุงเฉพาะข้อมูลที่เปลี่ยน ไม่สร้างรายการซ้ำ)</span></label></div></div>' : '') +
+    '<div class="sec-t">ผลการตรวจสอบกับฐานข้อมูล (ยังไม่บันทึก) <span class="badge ' + (d.source === 'JHCIS' ? 'b-info' : 'b-ok') + '">' + (d.source === 'JHCIS' ? 'JHCIS' : 'สปสช.') + '</span></div>' + impStatGrid(d) +
+    (d.keptByJhcis ? '<div class="alert alert-info mt">' + ico('info') + '<div>ไม่ปิดสถานะ ' + fmt(d.keptByJhcis) + ' คนที่ไม่มีในไฟล์ สปสช. นี้ เพราะมีข้อมูลในทะเบียนประชากร JHCIS แล้ว (ไฟล์ สปสช. เป็นผลตรวจสิทธิบางส่วน)</div></div>' : '') +
+    (d.otherUnitRows ? '<div class="alert alert-warn mt">' + ico('alert') + '<div>มี ' + fmt(d.otherUnitRows) + ' แถวที่รหัสหน่วยบริการในไฟล์ไม่ใช่ ' + esc(cfg().unitCode) + ' กรุณาตรวจสอบไฟล์</div></div>' : '') +
+    (d.villageUpdates && d.villageUpdates.length ? '<div class="sec-t">ข้อมูลหมู่บ้านที่จะปรับปรุงจากไฟล์</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>หมู่บ้าน</th><th>ชื่อหมู่บ้าน (เติมเมื่อยังว่าง)</th><th>จนท. ผู้รับผิดชอบ</th></tr></thead><tbody>' +
+      d.villageUpdates.map(u => '<tr><td>' + esc(u.label) + '</td><td>' + esc(u.name || '— คงเดิม —') + '</td><td>' + esc(u.staffName || '— คงเดิม —') + '</td></tr>').join('') + '</tbody></table></div>' : '') +
+    '<div class="grid g-2 mt"><div><div class="sec-t">แยกตามหมู่บ้าน</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>หมู่บ้าน</th><th class="r">ในไฟล์</th><th class="r">ใหม่</th><th class="r">ปรับปรุง</th><th class="r">ปิดสถานะ</th></tr></thead><tbody>' +
+      d.byVillage.map(v => '<tr><td>' + esc(v.label) + '</td><td class="r num">' + fmt(v.total) + '</td><td class="r num">' + fmt(v.inserted) + '</td><td class="r num">' + fmt(v.updated) + '</td><td class="r num">' + fmt(v.deactivated) + '</td></tr>').join('') + '</tbody></table></div></div>' +
+    '<div><div class="sec-t">กลุ่มสิทธิและสถานะข้อมูลในไฟล์</div><div class="row" style="gap:6px">' +
+      GROUP_ORDER.filter(g => d.groupCounts[g]).map(g => '<span class="chip"><span class="swatch" style="background:' + GROUP_COLOR[g] + '"></span>' + esc(groupLabel(g)) + ' <b class="num">' + fmt(d.groupCounts[g]) + '</b></span>').join('') + '</div>' +
+      (hasTypeData(d.typeCounts) ? '<div class="row mt" style="gap:6px">' + TYPE_ORDER.filter(t => (d.typeCounts || {})[t]).map(t => '<span class="chip chip-blue"><span class="swatch" style="background:' + TYPE_COLOR[t] + '"></span>' + esc(typeShort(t)) + ' <b class="num">' + fmt(d.typeCounts[t]) + '</b></span>').join('') + '</div>' : '') +
+      '<div class="row mt" style="gap:6px">' + FLAG_ORDER.filter(f => fc[f]).map(f => '<span class="badge ' + (ERR_FLAGS.includes(f) ? 'b-err' : 'b-warn') + '">' + esc(flagLabel(f)) + ' ' + fmt(fc[f]) + '</span>').join('') + '</div></div></div>' +
+    (d.invalidRows.length ? '<div class="sec-t">รายการที่ไม่ผ่านการตรวจสอบ (จะไม่ถูกนำเข้า)</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>แถว</th><th>เลขประจำตัว</th><th>ชื่อ</th><th>เหตุผล</th></tr></thead><tbody>' +
+      d.invalidRows.map(x => '<tr><td>' + x.row + '</td><td class="num">' + esc(x.pidMasked) + '</td><td>' + esc(x.name || '-') + '</td><td class="small" style="color:var(--red)">' + esc(x.reasons.join(' · ')) + '</td></tr>').join('') + '</tbody></table></div>' : '') +
+    (d.preview.length ? '<div class="sec-t">ตัวอย่างข้อมูลที่จะบันทึก (' + d.preview.length + ' รายการแรกที่เพิ่ม/ปรับปรุง)</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>ประเภท</th><th>แถว</th><th>ชื่อ</th><th>เลขประจำตัว</th><th>หมู่บ้าน</th><th>Type</th><th>สิทธิ</th><th>สถานะ</th></tr></thead><tbody>' +
+      d.preview.map(x => '<tr><td><span class="badge ' + (x.type === 'NEW' ? 'b-ok' : 'b-info') + '">' + (x.type === 'NEW' ? 'ใหม่' : 'ปรับปรุง') + '</span></td><td>' + x.row + '</td><td>' + esc(x.name || '-') + '</td><td class="num">' + esc(x.pidMasked) + '</td><td>' + esc(x.village) + '</td><td>' + esc(x.typeArea ? 'T' + x.typeArea : '-') + '</td><td>' + esc((x.mainInscl || 'รอตรวจสอบ') + ' ' + (x.subName || '')) + '</td><td class="small">' + esc(x.flags.map(flagLabel).join(', ') || 'สมบูรณ์') + '</td></tr>').join('') + '</tbody></table></div>' : '') +
+    '<div class="row mt"><button class="btn" data-action="imp-back2">‹ ย้อนกลับ</button><div class="spacer"></div>' +
+    '<button class="btn btn-orange" data-action="imp-commit"' + (d.valid ? '' : ' disabled') + '>' + ico('upload', 'ico-sm') + 'ยืนยันนำเข้า ' + fmt(d.inserted + d.updated) + ' รายการ</button></div></div>';
+}
+async function impCommit() {
+  const d = S.imp.dry;
+  const allowDup = $('#imp-allowdup') ? $('#imp-allowdup').checked : false;
+  if (d.duplicateFile && !allowDup) { toast('ไฟล์นี้เคยนำเข้าแล้ว กรุณาติ๊กยืนยันนำเข้าซ้ำ หรือเลือกไฟล์ใหม่', 'warn'); return; }
+  const ok = await confirmBox('ยืนยันการนำเข้าข้อมูล', '<p>ระบบจะสำรองข้อมูลเดิมก่อน แล้วบันทึก:</p><ul><li>เพิ่มใหม่ <b>' + fmt(d.inserted) + '</b> รายการ</li><li>ปรับปรุง <b>' + fmt(d.updated) + '</b> รายการ</li><li>ปิดสถานะ <b>' + fmt(d.deactivated) + '</b> รายการ</li><li>ไม่นำเข้า (ไม่ผ่านการตรวจสอบ) <b>' + fmt(d.invalid) + '</b> รายการ</li></ul>', 'ยืนยันนำเข้า', true);
+  if (!ok) return;
+  let r;
+  try { r = await call('importExcel', impPayload({ allowDuplicateFile: allowDup }), { text: 'กำลังนำเข้าข้อมูล กรุณาอย่าปิดหน้านี้...', timeout: IMPORT_TIMEOUT_MS }); }
+  catch (e) { impResult(null, e); return; }
+  S.overview = null; S.village = {};                 // ล้าง cache ให้ Dashboard โหลดข้อมูลใหม่
+  if (r.villageUpdates && r.villageUpdates.length) { try { S.profile = await api('me', {}); } catch (e) { /* ignore */ } }
+  impResult(r);
+}
+function impResult(r, err) {
+  impSteps(4);
+  if (err) {
+    $('#imp-body').innerHTML = '<div class="card"><div class="alert alert-error">' + ico('alert') + '<div><b>นำเข้าไม่สำเร็จ</b><br>' + esc(err.message) + '<br><span class="small">ข้อมูลเดิมไม่ถูกเปลี่ยนแปลง (หรือกู้คืนจากสำรองอัตโนมัติแล้ว)</span></div></div>' +
+      '<div class="row mt"><button class="btn" data-action="imp-back3">‹ กลับไปหน้าตรวจสอบ</button><button class="btn btn-primary" data-action="imp-restart">เลือกไฟล์ใหม่</button></div></div>';
+    return;
+  }
+  const okNo = r.status === 'NO_CHANGE';
+  $('#imp-body').innerHTML = '<div class="card"><div class="alert ' + (okNo ? 'alert-info' : 'alert-ok') + '">' + ico(okNo ? 'info' : 'check') + '<div><b>' + (okNo ? 'ไม่มีข้อมูลที่เปลี่ยนแปลง' : 'นำเข้าข้อมูลสำเร็จ') + '</b> · รหัสการนำเข้า ' + esc(r.importId) +
+    (r.backupSheet ? '<br><span class="small">สำรองข้อมูลก่อนนำเข้าไว้ที่ชีต ' + esc(r.backupSheet) + '</span>' : '') + '</div></div><div class="mt">' + impStatGrid(r) + '</div>' +
+    '<div class="row mt"><button class="btn" data-action="imp-restart">นำเข้าไฟล์ถัดไป</button>' + (perms().viewImportHistory ? '<button class="btn" data-action="go" data-view="history">ประวัติการนำเข้า</button>' : '') + '<div class="spacer"></div>' +
+    '<button class="btn btn-primary" data-action="go" data-view="' + (perms().viewOverview ? 'overview' : 'village') + '">' + ico('dashboard', 'ico-sm') + 'ดู Dashboard (ข้อมูลใหม่)</button></div></div>';
+  toast(okNo ? 'ข้อมูลเหมือนเดิม ไม่มีการเปลี่ยนแปลง' : 'นำเข้าสำเร็จ Dashboard อัปเดตแล้ว', 'ok');
+}
+
+/* ==========================================================================
+   VIEW: IMPORT HISTORY
+   ========================================================================== */
+async function renderHistoryView() {
+  const el = $('#view-history');
+  el.innerHTML = '<div class="skeleton" style="height:300px"></div>';
+  let rows;
+  try { rows = await call('getImportHistory', {}, { silent: true }); } catch (e) { el.innerHTML = errorBox(e, 'history'); return; }
+  S.importHistory = rows;
+  el.innerHTML = '<div class="page-hero"><div><h1>ประวัติการนำเข้าข้อมูล</h1><p>200 รายการล่าสุด · บันทึกผู้ดำเนินการ วันเวลา และผลการนำเข้า</p></div><div class="spacer"></div>' +
+    '<button class="btn" data-action="export-history">' + ico('download', 'ico-sm') + 'Excel</button></div>' +
+    '<div class="card">' + historyTable(rows) + '</div>';
+}
+function historyTable(rows) {
+  if (!rows.length) return '<div class="empty">ยังไม่มีประวัติการนำเข้า</div>';
+  const st = s => s === 'SUCCESS' ? '<span class="badge b-ok">สำเร็จ</span>' : s === 'NO_CHANGE' ? '<span class="badge b-info">ไม่เปลี่ยนแปลง</span>' : '<span class="badge b-err">ล้มเหลว</span>';
+  return '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>วันเวลา</th><th>ผู้ดำเนินการ</th><th>ไฟล์</th><th>หมู่บ้าน</th><th class="r">แถว</th><th class="r">ใหม่</th><th class="r">ปรับปรุง</th><th class="r">ไม่ผ่าน</th><th class="r">ปิดสถานะ</th><th>ผล</th><th>รายละเอียด</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td class="small">' + thDate(r.Timestamp) + '</td><td>' + esc(r.Username) + '</td><td class="small" style="max-width:220px;word-break:break-all">' + esc(r.FileName) + '<div class="xs muted">' + esc(r.ImportID) + (r.Source ? ' · ' + (r.Source === 'JHCIS' ? 'JHCIS' : 'สปสช.') : '') + '</div></td><td class="small">' + esc(String(r.VillageIDs || '').split(',').filter(Boolean).map(v => 'ม.' + Number(v.slice(1))).join(', ')) + '</td>' +
+      '<td class="r num">' + fmt(r.TotalRows) + '</td><td class="r num">' + fmt(r.Inserted) + '</td><td class="r num">' + fmt(r.Updated) + '</td><td class="r num">' + fmt(r.Invalid) + '</td><td class="r num">' + fmt(r.Deactivated) + '</td><td>' + st(r.Status) + '</td><td class="small">' + esc(r.Message) + (r.BackupSheet ? '<div class="xs muted">สำรอง: ' + esc(r.BackupSheet) + '</div>' : '') + '</td></tr>').join('') +
+    '</tbody></table></div>';
+}
+
+/* ==========================================================================
+   VIEW: USERS (ADMIN)
+   ========================================================================== */
+async function renderUsersView(opts) {
+  const el = $('#view-users');
+  if (!S.users || opts.refresh) {
+    el.innerHTML = '<div class="skeleton" style="height:300px"></div>';
+    try { S.users = await call('manageUsers', { op: 'list' }, { silent: true }); } catch (e) { el.innerHTML = errorBox(e, 'users'); return; }
+  }
+  const U = S.users.users, V = S.users.villages;
+  const f = S.userFilter || { role: '', q: '' };
+  const list = U.filter(u => (!f.role || u.role === f.role) && (!f.q || (u.username + ' ' + u.displayName).toLowerCase().includes(f.q.toLowerCase())));
+  const cover = V.map(v => { const n = U.filter(u => u.role === 'VILLAGE_USER' && u.villageId === v.id && u.status === 'ACTIVE').length;
+    return '<span class="chip ' + (n ? '' : 'chip-red') + '" title="' + esc(v.label) + '">ม.' + v.moo + ' · ' + (n ? n + ' บัญชี' : 'ยังไม่มี') + '</span>'; }).join('');
+  const st = u => u.status !== 'ACTIVE' ? '<span class="badge b-gray">ระงับ</span>' : (u.lockedUntil && Number(u.lockedUntil) > Date.now()) ? '<span class="badge b-err">ล็อก</span>' : u.mustChangePassword ? '<span class="badge b-warn">รอเปลี่ยนรหัส</span>' : '<span class="badge b-ok">ใช้งาน</span>';
+  const scope = u => u.role === 'VILLAGE_USER' ? esc(villageLabelFrom(V, u.villageId)) : u.role === 'STAFF' ? (u.allowedVillages === 'ALL' ? 'ทุกหมู่บ้าน' : esc(u.allowedVillages)) : 'ทั้งระบบ';
+  el.innerHTML = '<div class="page-hero"><div><h1>จัดการผู้ใช้งาน</h1><p>กำหนดบทบาทและหมู่บ้านที่รับผิดชอบ · รหัสผ่านถูกเก็บแบบ Hash + Salt</p></div><div class="spacer"></div>' +
+    '<button class="btn" data-action="user-template">' + ico('download', 'ico-sm') + 'แม่แบบบัญชี อสม.</button>' +
+    '<label class="btn btn-blue" style="cursor:pointer">' + ico('upload', 'ico-sm') + 'นำเข้าบัญชีจาก Excel<input type="file" id="user-bulk" accept=".xlsx,.xls" hidden></label>' +
+    '<button class="btn btn-primary" data-action="user-new">' + ico('plus', 'ico-sm') + 'เพิ่มผู้ใช้</button></div>' +
+    '<div class="card"><div class="card-h"><h3>บัญชี อสม. ครอบคลุม 12 หมู่บ้าน</h3></div><div class="villages-cover">' + cover + '</div></div>' +
+    '<div class="card mt"><div class="row" style="margin-bottom:12px"><input class="input" id="user-q" placeholder="ค้นหา username / ชื่อ" value="' + esc(f.q) + '" style="max-width:280px">' +
+    '<select class="input" id="user-role" style="max-width:200px"><option value="">ทุกบทบาท</option>' + Object.keys(ROLE_LABEL).map(r => '<option value="' + r + '"' + (f.role === r ? ' selected' : '') + '>' + ROLE_LABEL[r] + '</option>').join('') + '</select>' +
+    '<span class="muted small">' + list.length + ' บัญชี</span></div>' +
+    '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Username</th><th>ชื่อที่แสดง</th><th>บทบาท</th><th>ขอบเขตหมู่บ้าน</th><th class="c">นำเข้า Excel</th><th>สถานะ</th><th>เข้าใช้ล่าสุด</th><th>จัดการ</th></tr></thead><tbody>' +
+    list.map(u => '<tr><td><b>' + esc(u.username) + '</b></td><td>' + esc(u.displayName) + '</td><td><span class="badge ' + (u.role === 'ADMIN' ? 'b-orange' : u.role === 'STAFF' ? 'b-info' : 'b-ok') + '">' + esc(ROLE_LABEL[u.role] || u.role) + '</span></td><td class="small">' + scope(u) + '</td>' +
+      '<td class="c">' + (u.canImport ? '✓' : '–') + '</td><td>' + st(u) + '</td><td class="small">' + (u.lastLogin ? thDate(u.lastLogin) : '-') + '</td>' +
+      '<td><div class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn btn-sm" data-action="user-edit" data-id="' + esc(u.userId) + '">แก้ไข</button>' +
+      '<button class="btn btn-sm" data-action="user-reset" data-id="' + esc(u.userId) + '" title="รีเซ็ตรหัสผ่าน">' + ico('key', 'ico-sm') + '</button>' +
+      ((u.lockedUntil && Number(u.lockedUntil) > Date.now()) ? '<button class="btn btn-sm" data-action="user-unlock" data-id="' + esc(u.userId) + '">ปลดล็อก</button>' : '') +
+      '<button class="btn btn-sm ' + (u.status === 'ACTIVE' ? 'btn-danger' : '') + '" data-action="user-status" data-id="' + esc(u.userId) + '" data-status="' + (u.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE') + '">' + (u.status === 'ACTIVE' ? 'ระงับ' : 'เปิดใช้') + '</button></div></td></tr>').join('') +
+    '</tbody></table></div></div>';
+  $('#user-q').addEventListener('input', e => { S.userFilter = Object.assign({}, f, { q: e.target.value }); renderUsersView({}); const q = $('#user-q'); q.focus(); q.setSelectionRange(q.value.length, q.value.length); });
+  $('#user-role').addEventListener('change', e => { S.userFilter = Object.assign({}, f, { role: e.target.value }); renderUsersView({}); });
+  $('#user-bulk').addEventListener('change', e => { if (e.target.files[0]) bulkUsers(e.target.files[0]); e.target.value = ''; });
+}
+function villageLabelFrom(V, id) { const v = V.find(x => x.id === id); return v ? v.label : (id || '-'); }
+function userForm(u) {
+  const V = S.users.villages, isNew = !u;
+  u = u || { role: 'VILLAGE_USER', villageId: '', allowedVillages: 'ALL', canImport: false };
+  const m = openModal(modalHead(isNew ? 'เพิ่มผู้ใช้งาน' : 'แก้ไขผู้ใช้: ' + u.username) + '<form id="user-form" class="modal-b"><div class="form-grid">' +
+    '<div class="field"><label>Username *</label><input class="input" name="username" required pattern="[a-z0-9._\\-]{3,32}" value="' + esc(u.username || '') + '"' + (isNew ? '' : ' disabled') + ' placeholder="เช่น osm.m08"><span class="xs muted">a-z 0-9 . _ - (3–32 ตัว)</span></div>' +
+    '<div class="field"><label>ชื่อที่แสดง *</label><input class="input" name="displayName" required maxlength="100" value="' + esc(u.displayName || '') + '"></div>' +
+    '<div class="field"><label>บทบาท *</label><select class="input" name="role">' + Object.keys(ROLE_LABEL).map(r => '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + r + ' · ' + ROLE_LABEL[r] + '</option>').join('') + '</select></div>' +
+    '<div class="field" data-for="VILLAGE_USER"><label>หมู่บ้านที่รับผิดชอบ (อสม.) *</label><select class="input" name="villageId"><option value="">— เลือก —</option>' + V.map(v => '<option value="' + v.id + '"' + (u.villageId === v.id ? ' selected' : '') + '>' + esc(v.label) + '</option>').join('') + '</select></div>' +
+    '<div class="field" data-for="STAFF"><label>ขอบเขตหมู่บ้าน (STAFF)</label><input class="input" name="allowedVillages" value="' + esc(u.allowedVillages || 'ALL') + '" placeholder="ALL หรือ V01,V02"><span class="xs muted">ALL = ทุกหมู่บ้าน หรือระบุ V01,V05</span></div>' +
+    '<div class="field" data-for="STAFF"><label>สิทธิ์เพิ่มเติม</label><label class="check"><input type="checkbox" name="canImport"' + (u.canImport ? ' checked' : '') + '><span>อนุญาตให้นำเข้าไฟล์ Excel</span></label></div>' +
+    '<div class="field"><label>เบอร์โทร</label><input class="input" name="phone" maxlength="20" value="' + esc(u.phone || '') + '"></div>' +
+    '<div class="field"><label>หมายเหตุ</label><input class="input" name="note" maxlength="200" value="' + esc(u.note || '') + '"></div>' +
+    (isNew ? '<div class="field full"><label>รหัสผ่านตั้งต้น (เว้นว่าง = ระบบสุ่มให้)</label><input class="input" name="password" type="text" autocomplete="off" maxlength="64"><span class="xs muted">ผู้ใช้ต้องเปลี่ยนรหัสผ่านเมื่อเข้าใช้ครั้งแรก</span></div>' : '') +
+    '</div><div class="alert alert-error mt" id="uf-err" hidden></div></form><div class="modal-f"><button class="btn" data-action="close-modal">ยกเลิก</button><button class="btn btn-primary" id="uf-save">บันทึก</button></div>');
+  const form = $('#user-form', m);
+  const sync = () => $$('[data-for]', form).forEach(x => { x.hidden = x.dataset.for !== form.role.value; });
+  form.role.addEventListener('change', sync); sync();
+  $('#uf-save', m).addEventListener('click', async () => {
+    if (!form.reportValidity()) return;
+    const o = { displayName: form.displayName.value.trim(), role: form.role.value, villageId: form.villageId.value, allowedVillages: form.allowedVillages.value.trim(), canImport: form.canImport.checked, phone: form.phone.value.trim(), note: form.note.value.trim() };
+    try {
+      let r;
+      if (isNew) { o.username = form.username.value.trim().toLowerCase(); o.password = form.password.value; r = await call('manageUsers', { op: 'create', user: o }); }
+      else r = await call('manageUsers', { op: 'update', userId: u.userId, user: o });
+      m.remove();
+      toast('บันทึกบัญชีเรียบร้อย', 'ok');
+      if (r.tempPassword) showTempPassword(r.user.username, r.tempPassword);
+      renderUsersView({ refresh: true });
+    } catch (e) { const er = $('#uf-err', m); er.textContent = e.message; er.hidden = false; }
+  });
+}
+function showTempPassword(username, pw) {
+  openModal(modalHead('รหัสผ่านตั้งต้น') + '<div class="modal-b"><p>บัญชี <b>' + esc(username) + '</b></p><div class="temp-pw">' + esc(pw) + '</div>' +
+    '<div class="alert alert-warn mt">' + ico('alert') + '<div>รหัสผ่านนี้แสดงเพียงครั้งเดียว กรุณาแจ้งผู้ใช้โดยตรง (ไม่ส่งในกลุ่มสาธารณะ) ผู้ใช้ต้องเปลี่ยนรหัสผ่านเมื่อเข้าใช้ครั้งแรก</div></div></div>' +
+    '<div class="modal-f"><button class="btn" data-action="copy" data-text="' + esc(pw) + '">คัดลอก</button><button class="btn btn-primary" data-action="close-modal">ปิด</button></div>');
+}
+function downloadUserTemplate() {
+  const rows = [['Username', 'DisplayName', 'Role', 'VillageID', 'AllowedVillages', 'CanImport', 'InitialPassword', 'Phone', 'Note']];
+  for (let i = 1; i <= 12; i++) rows.push(['osm.m' + String(i).padStart(2, '0'), 'อสม. หมู่ที่ ' + i + ' (แก้เป็นชื่อจริง)', 'VILLAGE_USER', 'V' + String(i).padStart(2, '0'), '', 'FALSE', '', '', '']);
+  rows.push(['staff01', 'เจ้าหน้าที่ รพ.สต. (ตัวอย่าง)', 'STAFF', '', 'ALL', 'FALSE', '', '', '']);
+  const help = [['คอลัมน์', 'คำอธิบาย'], ['Username', 'a-z 0-9 . _ - ความยาว 3–32 ตัว ห้ามซ้ำ'], ['Role', 'ADMIN / STAFF / VILLAGE_USER'], ['VillageID', 'V01–V12 (จำเป็นสำหรับ VILLAGE_USER)'],
+    ['AllowedVillages', 'สำหรับ STAFF: ALL หรือ V01,V02'], ['CanImport', 'TRUE/FALSE (เฉพาะ STAFF)'], ['InitialPassword', 'เว้นว่างให้ระบบสุ่ม หรือกำหนดเอง ≥8 ตัว มีตัวอักษรและตัวเลข'], ['หมายเหตุ', 'ทุกบัญชีต้องเปลี่ยนรหัสผ่านเมื่อเข้าใช้ครั้งแรก']];
+  downloadXlsx('แม่แบบบัญชีผู้ใช้_SHC.xlsx', [{ name: 'Users', rows: rows }, { name: 'คำอธิบาย', rows: help }]);
+}
+async function bulkUsers(file) {
+  if (!window.XLSX) return toast('โหลดไลบรารี Excel ไม่สำเร็จ', 'err');
+  let list;
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+    const aoa = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+    const h = (aoa[0] || []).map(x => String(x).trim().toLowerCase());
+    const col = n => h.indexOf(n.toLowerCase());
+    if (col('Username') < 0 || col('Role') < 0) throw new Error('ไม่พบหัวคอลัมน์ Username / Role (ใช้แม่แบบจากปุ่ม "แม่แบบบัญชี อสม.")');
+    list = aoa.slice(1).filter(r => String(r[col('Username')] || '').trim()).map(r => {
+      const g = n => col(n) >= 0 ? String(r[col(n)] || '').trim() : '';
+      return { username: g('Username').toLowerCase(), displayName: g('DisplayName'), role: g('Role').toUpperCase(), villageId: g('VillageID'), allowedVillages: g('AllowedVillages'), canImport: g('CanImport').toUpperCase() === 'TRUE', password: g('InitialPassword'), phone: g('Phone'), note: g('Note') };
+    });
+  } catch (e) { return toast('อ่านไฟล์ไม่สำเร็จ: ' + e.message, 'err'); }
+  if (!list.length) return toast('ไม่พบรายการบัญชีในไฟล์', 'warn');
+  if (!(await confirmBox('นำเข้าบัญชีผู้ใช้', 'พบ <b>' + list.length + '</b> บัญชีในไฟล์ ' + esc(file.name) + '<br>บัญชีที่ Username ซ้ำจะถูกข้าม', 'สร้างบัญชี'))) return;
+  let r;
+  try { r = await call('manageUsers', { op: 'bulkCreate', users: list }, { text: 'กำลังสร้างบัญชี...', timeout: 180000 }); } catch (e) { return; }
+  const ok = r.results.filter(x => x.ok);
+  S.bulkResult = r.results;
+  openModal(modalHead('ผลการสร้างบัญชี') + '<div class="modal-b"><p>สำเร็จ <b>' + ok.length + '</b> / ' + r.results.length + ' บัญชี</p><div class="tbl-wrap"><table class="tbl"><thead><tr><th>แถว</th><th>Username</th><th>ผล</th><th>รหัสผ่านตั้งต้น</th></tr></thead><tbody>' +
+    r.results.map(x => '<tr><td>' + x.row + '</td><td>' + esc(x.username) + '</td><td>' + (x.ok ? '<span class="badge b-ok">สำเร็จ</span>' : '<span class="badge b-err">' + esc(x.error) + '</span>') + '</td><td class="num">' + esc(x.tempPassword || '') + '</td></tr>').join('') +
+    '</tbody></table></div><div class="alert alert-warn mt">' + ico('alert') + '<div>รหัสผ่านแสดงเพียงครั้งเดียว ดาวน์โหลดเก็บไว้แจก อสม. แล้วลบไฟล์ทิ้งหลังแจกเสร็จ</div></div></div>' +
+    '<div class="modal-f"><button class="btn" data-action="bulk-download">' + ico('download', 'ico-sm') + 'ดาวน์โหลดรายการรหัสผ่าน</button><button class="btn btn-primary" data-action="close-modal">ปิด</button></div>', { wide: true });
+  renderUsersView({ refresh: true });
+}
+
+/* ==========================================================================
+   VIEW: AUDIT LOG (ADMIN)
+   ========================================================================== */
+async function renderAuditView(opts) {
+  const el = $('#view-audit');
+  const f = S.auditFilter || { action: '', username: '', result: '' };
+  el.innerHTML = '<div class="page-hero"><div><h1>ประวัติการเข้าใช้งานและกิจกรรมสำคัญ</h1><p>Login, การดูข้อมูลรายบุคคล, การค้นหา, การนำเข้า, การจัดการผู้ใช้ และการพยายามเข้าถึงโดยไม่มีสิทธิ์</p></div></div>' +
+    '<form class="card" id="audit-form"><div class="filters"><div class="field"><label>กิจกรรม</label><select class="input" name="action"><option value="">ทั้งหมด</option>' +
+    ['LOGIN_SUCCESS', 'LOGIN_FAIL', 'LOGOUT', 'ACCESS_DENIED', 'VIEW_DASHBOARD', 'VIEW_PERSON', 'SEARCH', 'SEARCH_PID', 'EXPORT', 'IMPORT_VALIDATE', 'IMPORT', 'USER_CREATE', 'USER_BULK_CREATE', 'USER_UPDATE', 'USER_STATUS', 'USER_RESET_PASSWORD', 'USER_UNLOCK', 'CHANGE_PASSWORD', 'UPDATE_CONFIG', 'UPDATE_VILLAGE']
+      .map(a => '<option' + (f.action === a ? ' selected' : '') + '>' + a + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Username</label><input class="input" name="username" value="' + esc(f.username) + '"></div>' +
+    '<div class="field"><label>ผลลัพธ์</label><select class="input" name="result"><option value="">ทั้งหมด</option>' + ['OK', 'FAIL', 'DENIED'].map(x => '<option' + (f.result === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>&nbsp;</label><button class="btn btn-primary" type="submit">' + ico('search', 'ico-sm') + 'แสดง</button></div></div></form><div id="audit-list" class="mt"><div class="skeleton" style="height:300px"></div></div>';
+  $('#audit-form').addEventListener('submit', e => { e.preventDefault(); const fm = e.target; S.auditFilter = { action: fm.action.value, username: fm.username.value.trim(), result: fm.result.value }; renderAuditView({}); });
+  let d;
+  try { d = await call('getAuditLog', f, { silent: true }); } catch (e) { $('#audit-list').innerHTML = errorBox(e, 'audit'); return; }
+  const rb = r => r === 'OK' ? 'b-ok' : r === 'DENIED' ? 'b-orange' : 'b-err';
+  $('#audit-list').innerHTML = '<div class="card"><div class="muted small" style="margin-bottom:10px">แสดง ' + d.items.length + ' รายการล่าสุด (บันทึกทั้งหมด ' + fmt(d.total) + ')</div>' +
+    (d.items.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>วันเวลา</th><th>ผู้ใช้</th><th>บทบาท</th><th>กิจกรรม</th><th>เป้าหมาย</th><th>รายละเอียด</th><th>ผล</th></tr></thead><tbody>' +
+      d.items.map(x => '<tr><td class="small" style="white-space:nowrap">' + thDate(x.timestamp) + '</td><td>' + esc(x.username) + '</td><td class="small">' + esc(x.role) + '</td><td><b class="small">' + esc(x.action) + '</b></td><td class="small">' + esc(x.target) + '</td><td class="small">' + esc(x.detail) + '</td><td><span class="badge ' + rb(x.result) + '">' + esc(x.result) + '</span></td></tr>').join('') +
+      '</tbody></table></div>' : '<div class="empty">ไม่พบรายการ</div>') + '</div>';
+}
+
+/* ==========================================================================
+   VIEW: SETTINGS (ADMIN)
+   ========================================================================== */
+async function renderSettingsView() {
+  const el = $('#view-settings');
+  el.innerHTML = '<div class="skeleton" style="height:300px"></div>';
+  let d;
+  try { d = await call('getSystemConfig', {}, { silent: true }); } catch (e) { el.innerHTML = errorBox(e, 'settings'); return; }
+  el.innerHTML = '<div class="page-hero"><div><h1>ตั้งค่าระบบ</h1><p>ฐานข้อมูล: ' + esc(d.spreadsheetName) + ' · โครงสร้างข้อมูล v' + esc(d.schemaVersion || '-') + ' · สรุปล่าสุด ' + thDate(d.summaryUpdatedAt) + '</p></div><div class="spacer"></div>' +
+    '<button class="btn" data-action="rebuild-data" title="ใช้หลังแก้ไขชีต CodeLookup (เช่น การจัดกลุ่มรหัสสิทธิ JHCIS หรือชื่อกลุ่มโรค)">' + ico('refresh', 'ico-sm') + 'คำนวณสรุปใหม่</button></div>' +
+    '<div class="card"><div class="card-h"><h3>ข้อมูลหมู่บ้าน 12 หมู่บ้าน</h3><span class="sub">ชื่อหมู่บ้านและ จนท. ผู้รับผิดชอบ (เติมอัตโนมัติจากไฟล์ JHCIS แก้ไขได้)</span></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>รหัส</th><th>หมู่ที่</th><th>ชื่อหมู่บ้าน</th><th>จนท. ผู้รับผิดชอบ</th><th>หมายเหตุ</th><th></th></tr></thead><tbody>' +
+    d.villages.map(v => '<tr><td><b>' + esc(v.id) + '</b></td><td>' + v.moo + '</td><td><input class="input" id="vn-' + esc(v.id) + '" value="' + esc(v.name) + '" placeholder="เช่น บ้าน..." maxlength="80"></td><td><input class="input" id="vs-' + esc(v.id) + '" value="' + esc(v.staffName || '') + '" maxlength="80"></td><td><input class="input" id="vt-' + esc(v.id) + '" value="' + esc(v.note) + '" maxlength="200"></td><td><button class="btn btn-sm btn-primary" data-action="save-village" data-id="' + esc(v.id) + '">บันทึก</button></td></tr>').join('') +
+    '</tbody></table></div></div>' +
+    '<div class="card mt"><div class="card-h"><h3>ค่าตั้งระบบ</h3></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Key</th><th>ค่า</th><th>คำอธิบาย</th><th></th></tr></thead><tbody>' +
+    d.items.map(i => '<tr><td class="small"><b>' + esc(i.key) + '</b></td><td style="min-width:200px"><input class="input" id="cfg-' + esc(i.key) + '" value="' + esc(i.value) + '"></td><td class="small muted">' + esc(i.description) + '</td><td><button class="btn btn-sm" data-action="save-config" data-key="' + esc(i.key) + '">บันทึก</button></td></tr>').join('') +
+    '</tbody></table></div></div>';
+}
+
+/* ==========================================================================
+   VIEW: ACCOUNT
+   ========================================================================== */
+function renderAccountView() {
+  const p = S.profile;
+  $('#view-account').innerHTML = '<div class="page-hero"><div><h1>บัญชีของฉัน</h1></div></div><div class="grid g-2"><div class="card"><div class="card-h"><h3>ข้อมูลบัญชี</h3></div><dl class="dl">' +
+    '<dt>Username</dt><dd>' + esc(p.username) + '</dd><dt>ชื่อที่แสดง</dt><dd>' + esc(p.displayName) + '</dd><dt>บทบาท</dt><dd>' + esc(ROLE_LABEL[p.role] || p.role) + '</dd>' +
+    '<dt>หมู่บ้านที่เข้าถึงได้</dt><dd>' + (p.role === 'VILLAGE_USER' ? esc(p.village ? p.village.label : '-') : p.villages.length === 12 ? 'ทุกหมู่บ้าน (12)' : esc(p.villages.map(v => 'ม.' + v.moo).join(', '))) + '</dd>' +
+    '<dt>Session หมดอายุ</dt><dd>' + (p.expiresAt ? esc(new Date(p.expiresAt).toLocaleString('th-TH')) : '-') + ' หรือเมื่อไม่ใช้งาน ' + esc(cfg().idleMinutes) + ' นาที</dd></dl></div>' +
+    '<div class="card"><div class="card-h"><h3>ความปลอดภัย</h3></div><p class="small muted">ควรเปลี่ยนรหัสผ่านอย่างสม่ำเสมอ และไม่ใช้รหัสผ่านร่วมกับผู้อื่น เมื่อเปลี่ยนรหัสผ่าน อุปกรณ์อื่นจะถูกออกจากระบบ</p>' +
+    '<div class="row"><button class="btn btn-primary" data-action="change-pw">' + ico('key', 'ico-sm') + 'เปลี่ยนรหัสผ่าน</button><button class="btn btn-danger" data-action="logout">' + ico('logout', 'ico-sm') + 'ออกจากระบบ</button></div></div></div>';
+}
+
+/* ==========================================================================
+   VIEW: REPORTS
+   ========================================================================== */
+const REPORTS = [
+  { id: 'overview', title: 'รายงานภาพรวมประชาชน 12 หมู่บ้าน', desc: 'จำนวนประชากรและกลุ่มสิทธิรายหมู่บ้าน', ok: p => p.viewOverview },
+  { id: 'byVillage', title: 'รายงานประเภทสิทธิแยกตามหมู่บ้าน', desc: 'ตารางไขว้ สิทธิหลัก × หมู่บ้าน (จำนวน/ร้อยละ)', ok: p => p.viewOverview },
+  { id: 'typearea', title: 'รายงานเป้าหมายประชากรตาม Type 1,2,3', desc: 'ประชากร/ครัวเรือนตามประเภทการอยู่อาศัย × หมู่บ้าน และกลุ่มสิทธิ', ok: p => p.viewOverview },
+  { id: 'proportion', title: 'รายงานสัดส่วนประเภทสิทธิ', desc: 'กลุ่มสิทธิ สิทธิหลัก และสิทธิย่อย พร้อมร้อยละ', ok: () => true },
+  { id: 'chronic', title: 'รายงานกลุ่มโรคเรื้อรัง/กลุ่มเป้าหมาย', desc: 'DM HT IHD ST CA AM ANC แยกตามหมู่บ้าน', ok: p => p.viewOverview },
+  { id: 'incomplete', title: 'รายงานประชาชนที่ต้องตรวจสอบ/ติดตาม', desc: 'รายชื่อตามสถานะ เช่น สิทธิหมดอายุ สิทธิไม่สอดคล้องกับอายุ', ok: () => true },
+  { id: 'village', title: 'รายงานสำหรับ อสม. รายหมู่บ้าน', desc: 'สรุปสิทธิ ประเภทการอยู่ โรคเรื้อรัง ของหมู่บ้าน', ok: () => true },
+  { id: 'osm', title: 'รายงานความรับผิดชอบ อสม.', desc: 'จำนวนประชากรที่ อสม. แต่ละคนดูแล และรายการติดตาม', ok: () => true },
+  { id: 'imports', title: 'รายงานประวัติการนำเข้าข้อมูล', desc: 'ผลการนำเข้าแต่ละครั้ง', ok: p => p.viewImportHistory }
+];
+function renderReportsView(opts) {
+  const el = $('#view-reports');
+  const list = REPORTS.filter(r => r.ok(perms()));
+  if (opts.type) S.reportType = opts.type;
+  el.innerHTML = '<div class="page-hero no-print"><div><h1>รายงาน</h1><p>เลือกรายงาน แล้วพิมพ์ / บันทึกเป็น PDF / ส่งออก Excel ตามสิทธิ์ของท่าน</p></div></div>' +
+    '<div class="report-cards no-print">' + list.map(r => '<button class="rcard ' + (S.reportType === r.id ? 'on' : '') + '" data-action="report" data-type="' + r.id + '"><div class="ri">' + ico('report') + '</div><b>' + esc(r.title) + '</b><span>' + esc(r.desc) + '</span></button>').join('') + '</div>' +
+    '<div id="report-area" class="mt"></div>';
+  if (S.reportType && list.some(r => r.id === S.reportType)) buildReport(S.reportType, opts);
+}
+async function getOverviewData() {
+  if (!S.overview || S.overview.typeArea !== S.ovType) S.overview = await call('getDashboardData', { typeArea: S.ovType }, { text: 'กำลังโหลดข้อมูล...' });
+  return S.overview;
+}
+async function getVillageData(vid) {
+  const isVU = S.profile.role === 'VILLAGE_USER';
+  const key = (isVU ? S.profile.villageId : vid) + '|' + S.vType;
+  const params = { typeArea: S.vType };
+  if (!isVU) params.villageId = vid;
+  if (!S.village[key]) S.village[key] = await call('getVillageDashboard', params, { text: 'กำลังโหลดข้อมูล...' });
+  return S.village[key];
+}
+async function buildReport(type, opts) {
+  S.reportType = type;
+  $$('.rcard').forEach(c => c.classList.toggle('on', c.dataset.type === type));
+  const area = $('#report-area');
+  const p = S.profile, isVU = p.role === 'VILLAGE_USER';
+  const villageSel = (cur, allowAll) => isVU ? '' : '<select class="input no-print" id="rep-village" style="max-width:260px">' + (allowAll ? '<option value="">ทุกหมู่บ้านในสิทธิ์</option>' : '') + p.villages.map(v => '<option value="' + v.id + '"' + (v.id === cur ? ' selected' : '') + '>' + esc(v.label) + '</option>').join('') + '</select>';
+  let rep;
+  try {
+    if (type === 'overview') rep = reportOverview(await getOverviewData());
+    else if (type === 'byVillage') rep = reportByVillage(await getOverviewData());
+    else if (type === 'typearea') {
+      if (S.ovType !== 'ALL') { S.ovType = 'ALL'; }
+      rep = reportTypeArea(await getOverviewData());
+    } else if (type === 'chronic') rep = reportChronic(await getOverviewData());
+    else if (type === 'osm') {
+      const vid = isVU ? p.villageId : (opts.villageId || S.currentVillage || p.villages[0].id);
+      rep = reportOsm(await getVillageData(vid));
+      rep.tools = villageSel(vid, false);
+    }
+    else if (type === 'proportion') {
+      const vid = opts.villageId !== undefined ? opts.villageId : (isVU ? p.villageId : '');
+      if (!vid && perms().viewOverview) rep = reportProportion((await getOverviewData()).totals, (await getOverviewData()).lookups, 'ทุกหมู่บ้านในสิทธิ์');
+      else { const d = await getVillageData(vid || p.villages[0].id); rep = reportProportion(d.totals, d.lookups, d.village.label); }
+      rep.tools = villageSel(vid, perms().viewOverview);
+    } else if (type === 'incomplete') {
+      const vid = opts.villageId !== undefined ? opts.villageId : '';
+      const flag = opts.flag || 'INCOMPLETE';
+      const params = { flag: flag, page: 1, pageSize: 500, sort: 'village' };
+      if (!isVU && vid) params.villageId = vid;
+      const d = await call('searchPopulation', params, { text: 'กำลังโหลดรายชื่อ...' });
+      rep = reportIncomplete(d, flag, isVU ? p.village.label : (vid ? villageLabel(vid) : 'ทุกหมู่บ้านในสิทธิ์'));
+      rep.tools = villageSel(vid, true) + '<select class="input no-print" id="rep-flag" style="max-width:300px">' + FLAG_ORDER.map(f => '<option value="' + f + '"' + (f === flag ? ' selected' : '') + '>' + esc(flagLabel(f)) + '</option>').join('') + '</select>';
+      rep.personLevel = true;
+    } else if (type === 'village') {
+      const vid = isVU ? p.villageId : (opts.villageId || S.currentVillage || p.villages[0].id);
+      rep = reportVillage(await getVillageData(vid));
+      rep.tools = villageSel(vid, false);
+    } else if (type === 'imports') {
+      const rows = await call('getImportHistory', {}, { text: 'กำลังโหลดข้อมูล...' });
+      rep = { title: 'รายงานประวัติการนำเข้าข้อมูล', subtitle: rows.length + ' รายการล่าสุด', html: historyTable(rows),
+        sheets: [{ name: 'ประวัติการนำเข้า', rows: [['วันเวลา', 'ผู้ดำเนินการ', 'ไฟล์', 'หมู่บ้าน', 'จำนวนแถว', 'เพิ่มใหม่', 'ปรับปรุง', 'ไม่เปลี่ยน', 'ไม่ผ่าน', 'ปิดสถานะ', 'ผล', 'รายละเอียด']].concat(rows.map(r => [r.Timestamp, r.Username, r.FileName, r.VillageIDs, +r.TotalRows, +r.Inserted, +r.Updated, +r.Unchanged, +r.Invalid, +r.Deactivated, r.Status, r.Message])) }] };
+    }
+  } catch (e) { area.innerHTML = errorBox(e); return; }
+  const canExcel = !rep.personLevel || perms().exportPerson;
+  S.currentReport = rep;
+  area.innerHTML = '<div class="card"><div class="row no-print" style="margin-bottom:14px">' + (rep.tools || '') + '<div class="spacer"></div>' +
+    '<button class="btn" data-action="print-report">' + ico('print', 'ico-sm') + 'พิมพ์</button>' +
+    '<button class="btn" data-action="print-report" title="เลือกปลายทาง “บันทึกเป็น PDF” ในหน้าต่างพิมพ์">' + ico('file', 'ico-sm') + 'PDF</button>' +
+    '<button class="btn btn-primary" data-action="excel-report"' + (canExcel ? '' : ' disabled title="บทบาทของท่านไม่มีสิทธิ์ส่งออกรายชื่อรายบุคคล"') + '>' + ico('download', 'ico-sm') + 'Excel</button></div>' +
+    '<div class="print-head"><b class="kanit" style="font-size:18px">' + esc(cfg().systemName || 'SMART HEALTH COVERAGE – BUENGNIAM') + '</b><div class="small">' + esc(cfg().unitName) + ' ต.' + esc(cfg().tambon) + ' อ.' + esc(cfg().amphoe) + ' จ.' + esc(cfg().province) + '</div></div>' +
+    '<h2 style="font-size:21px;color:var(--em-900)">' + esc(rep.title) + '</h2><p class="muted small" style="margin:2px 0 16px">' + esc(rep.subtitle || '') + ' · พิมพ์โดย ' + esc(p.displayName) + ' · ' + nowThai() + '</p>' + rep.html +
+    (rep.personLevel ? '<p class="xs muted mt">เอกสารนี้มีข้อมูลส่วนบุคคล ใช้เพื่อการติดตามดูแลสุขภาพเท่านั้น ห้ามเผยแพร่ (PDPA)</p>' : '') + '</div>';
+  const vs = $('#rep-village'), fs = $('#rep-flag');
+  if (vs) vs.addEventListener('change', () => buildReport(type, { villageId: vs.value, flag: fs ? fs.value : undefined }));
+  if (fs) fs.addEventListener('change', () => buildReport(type, { villageId: vs ? vs.value : '', flag: fs.value }));
+  if (rep.after) rep.after();
+}
+function reportOverview(d) {
+  const T = d.totals, total = T.TOTAL.ALL || 0;
+  const rows = [['หมู่ที่', 'ชื่อหมู่บ้าน', 'ประชากร', 'ร้อยละ'].concat(GROUP_ORDER.map(groupLabel)).concat(['ข้อมูลไม่สมบูรณ์'])];
+  d.villages.forEach(v => rows.push([v.moo, v.name, v.total, +pctNum(v.total, total).toFixed(2)].concat(GROUP_ORDER.map(g => (v.groups || {})[g] || 0)).concat([v.incomplete])));
+  rows.push(['รวม', '', total, 100].concat(GROUP_ORDER.map(g => T.GROUP[g] || 0)).concat([(T.STATUS || {}).INCOMPLETE || 0]));
+  return { title: 'รายงานภาพรวมประชาชน 12 หมู่บ้าน', subtitle: (d.typeLabel ? d.typeLabel + ' · ' : '') + lastImportText(d.lastImport),
+    html: kpiCards(T, 'มีข้อมูล ' + d.villagesWithData + '/' + d.villages.length + ' หมู่บ้าน') +
+      '<div class="grid g-2 mt"><div class="chart-box"><canvas id="c-rep-1"></canvas></div><div class="chart-box"><canvas id="c-rep-2"></canvas></div></div>' +
+      '<div class="mt">' + villageTableHtml(d, total) + '</div><div class="sec-t">ข้อสังเกต</div>' + insightsHtml(d.insights, ''),
+    sheets: [{ name: 'ภาพรวมรายหมู่บ้าน', rows: rows }],
+    after: () => { doughnutGroups('c-rep-1', T.GROUP, total);
+      chart('c-rep-2', { type: 'bar', data: { labels: d.villages.map(v => 'ม.' + v.moo), datasets: [{ data: d.villages.map(v => v.total), backgroundColor: '#34d399', borderRadius: 4 }] }, options: barOpts() }); } };
+}
+function reportByVillage(d) {
+  const mains = Object.keys(d.totals.MAIN).sort((a, b) => d.totals.MAIN[b] - d.totals.MAIN[a]);
+  // ต้องการจำนวนสิทธิหลักรายหมู่บ้าน -> ใช้กลุ่มสิทธิจาก overview (สิทธิหลักรายหมู่ดูได้ในรายงานหมู่บ้าน)
+  const total = d.totals.TOTAL.ALL || 0;
+  const head = '<tr><th>หมู่บ้าน</th><th class="r">ประชากร</th>' + GROUP_ORDER.map(g => '<th class="r">' + esc(groupLabel(g)) + '</th>').join('') + '</tr>';
+  const body = d.villages.map(v => '<tr><td>' + esc(v.label) + '</td><td class="r num">' + fmt(v.total) + '</td>' + GROUP_ORDER.map(g => { const n = (v.groups || {})[g] || 0; return '<td class="r num">' + fmt(n) + '<div class="xs muted">' + pct(n, v.total) + '</div></td>'; }).join('') + '</tr>').join('');
+  const foot = '<tr><td>รวม</td><td class="r num">' + fmt(total) + '</td>' + GROUP_ORDER.map(g => '<td class="r num">' + fmt(d.totals.GROUP[g] || 0) + '<div class="xs muted">' + pct(d.totals.GROUP[g], total) + '</div></td>').join('') + '</tr>';
+  const rows = [['หมู่บ้าน', 'ประชากร'].concat(GROUP_ORDER.reduce((a, g) => a.concat([groupLabel(g), groupLabel(g) + ' (%)']), []))];
+  d.villages.forEach(v => rows.push([v.label, v.total].concat(GROUP_ORDER.reduce((a, g) => a.concat([(v.groups || {})[g] || 0, +pctNum((v.groups || {})[g], v.total).toFixed(2)]), []))));
+  const mrows = [['รหัสสิทธิหลัก', 'ชื่อสิทธิหลัก', 'กลุ่ม', 'จำนวน', 'ร้อยละ']].concat(mains.map(m => [m, d.lookups.main[m], groupLabel(d.lookups.mainGroup[m]), d.totals.MAIN[m], +pctNum(d.totals.MAIN[m], total).toFixed(2)]));
+  return { title: 'รายงานประเภทสิทธิแยกตามหมู่บ้าน', subtitle: 'จำนวนและร้อยละของประชากรในแต่ละหมู่บ้าน',
+    html: '<div class="chart-box tall"><canvas id="c-rep-st"></canvas></div><div class="tbl-wrap mt"><table class="tbl"><thead>' + head + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + '</tfoot></table></div>' +
+      '<div class="sec-t">สิทธิหลักทั้งหมดในขอบเขต</div>' + mainTableHtml(d.totals, d.lookups),
+    sheets: [{ name: 'กลุ่มสิทธิรายหมู่บ้าน', rows: rows }, { name: 'สิทธิหลัก', rows: mrows }],
+    after: () => chart('c-rep-st', { type: 'bar', data: { labels: d.villages.map(v => 'ม.' + v.moo), datasets: GROUP_ORDER.filter(g => d.totals.GROUP[g]).map(g => ({ label: groupLabel(g), data: d.villages.map(v => pctNum((v.groups || {})[g], v.total)), backgroundColor: GROUP_COLOR[g], borderColor: '#fff', borderWidth: { top: 2 } })) },
+      options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + c.parsed.y.toFixed(1) + '%' } } }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, max: 100, ticks: { callback: v => v + '%' }, grid: { color: '#eef2f1' } } } } }) };
+}
+function reportProportion(T, lk, scopeLabel) {
+  const total = T.TOTAL.ALL || 0;
+  const g = GROUP_ORDER.filter(x => T.GROUP[x]);
+  const grows = [['กลุ่มสิทธิ', 'จำนวน', 'ร้อยละ']].concat(g.map(x => [groupLabel(x), T.GROUP[x], +pctNum(T.GROUP[x], total).toFixed(2)]));
+  const mrows = [['รหัส', 'สิทธิหลัก', 'จำนวน', 'ร้อยละ']].concat(Object.keys(T.MAIN).map(m => [m, lk.main[m], T.MAIN[m], +pctNum(T.MAIN[m], total).toFixed(2)]));
+  const srows = [['สิทธิหลัก', 'สิทธิย่อย', 'ชื่อสิทธิย่อย', 'จำนวน', 'ร้อยละ']].concat(Object.keys(T.SUB).map(k => { const p = k.split('|'); return [p[0], p[1], lk.sub[k], T.SUB[k], +pctNum(T.SUB[k], total).toFixed(2)]; }));
+  return { title: 'รายงานสัดส่วนประเภทสิทธิ', subtitle: scopeLabel + ' · ประชากร ' + fmt(total) + ' คน',
+    html: '<div class="grid g-2"><div class="chart-box"><canvas id="c-rep-pg"></canvas></div><div class="chart-box"><canvas id="c-rep-pm"></canvas></div></div>' +
+      '<div class="sec-t">กลุ่มสิทธิ</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>กลุ่มสิทธิ</th><th class="r">จำนวน</th><th class="r">ร้อยละ</th></tr></thead><tbody>' + g.map(x => '<tr><td><span class="swatch" style="background:' + GROUP_COLOR[x] + '"></span>' + esc(groupLabel(x)) + '</td><td class="r num">' + fmt(T.GROUP[x]) + '</td><td class="r num">' + pct(T.GROUP[x], total) + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<div class="sec-t">สิทธิหลัก</div>' + mainTableHtml(T, lk) + '<div class="sec-t">สิทธิย่อย</div>' + subTableHtml(T, lk),
+    sheets: [{ name: 'กลุ่มสิทธิ', rows: grows }, { name: 'สิทธิหลัก', rows: mrows }, { name: 'สิทธิย่อย', rows: srows }],
+    after: () => { doughnutGroups('c-rep-pg', T.GROUP, total); pieMains('c-rep-pm', T.MAIN, lk, total); } };
+}
+function reportIncomplete(d, flag, scopeLabel) {
+  const rows = [['ลำดับ', 'หมู่ที่', 'บ้านเลขที่', 'คำนำหน้า', 'ชื่อ', 'นามสกุล', 'เลขประจำตัว (ปิดบัง)', 'Type', 'เพศ', 'อายุ', 'สิทธิหลัก', 'รหัสสิทธิย่อย', 'สิทธิย่อย', 'วันหมดอายุสิทธิ', 'อสม.', 'สถานะ']];
+  d.items.forEach((it, i) => rows.push([i + 1, it.moo, it.houseNo, it.prefix, it.firstName, it.lastName, it.pidMasked, it.typeArea, it.gender, it.ageYears === '' ? '' : Number(it.ageYears), it.mainInscl, it.subInscl, it.subName, it.subExpireDate, it.osmName, it.flags.map(flagLabel).join(', ')]));
+  return { title: 'รายงานประชาชนที่ต้องตรวจสอบ: ' + flagLabel(flag), subtitle: scopeLabel + ' · ' + fmt(d.total) + ' รายการ' + (d.total > d.items.length ? ' (แสดง ' + d.items.length + ' รายการแรก)' : ''),
+    html: d.items.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>หมู่</th><th>ชื่อ - นามสกุล</th><th>เลขประจำตัว</th><th>เพศ/อายุ</th><th>สิทธิ</th><th>สถานะ</th><th class="no-print"></th></tr></thead><tbody>' +
+      d.items.map((it, i) => '<tr><td>' + (i + 1) + '</td><td>ม.' + esc(it.moo) + (it.houseNo ? '<div class="xs muted">บ้าน ' + esc(it.houseNo) + '</div>' : '') + '</td><td><b>' + esc(personName(it)) + '</b>' + (it.osmName ? '<div class="xs muted">อสม. ' + esc(it.osmName) + '</div>' : '') + '</td><td class="num">' + esc(it.pidMasked) + '</td><td>' + esc(it.gender || '-') + ' ' + esc(it.ageYears === '' ? '' : it.ageYears) + (it.typeArea ? ' <span class="tag tag-b">T' + esc(it.typeArea) + '</span>' : '') + '</td><td class="small">' + esc((it.mainInscl || 'รอตรวจสอบ') + ' ' + (it.subInscl || '') + ' ' + (it.subName || '')) + '</td><td class="small">' + esc(it.flags.map(flagLabel).join(', ')) + '</td><td class="no-print"><button class="btn btn-sm" data-action="person" data-key="' + esc(it.key) + '">ดู</button></td></tr>').join('') +
+      '</tbody></table></div>' : '<div class="empty">' + ico('check') + '<div>ไม่พบรายการ</div></div>',
+    sheets: [{ name: 'รายชื่อ', rows: rows }] };
+}
+function reportVillage(d) {
+  const T = d.totals, total = T.TOTAL.ALL || 0, tc = d.typeCounts || {}, C = T.CHRONIC || {};
+  const F = Object.assign({}, T.FLAG, { INCOMPLETE: (T.STATUS || {}).INCOMPLETE || 0 });
+  const vfor = S.profile.role === 'VILLAGE_USER' ? '' : d.village.id;
+  const rows = [['รายการ', 'จำนวน', 'ร้อยละ'], ['ประชากร (' + (d.typeLabel || '') + ')', total, 100], ['ครัวเรือน', d.households || 0, '']]
+    .concat(GROUP_ORDER.filter(g => T.GROUP[g]).map(g => [groupLabel(g), T.GROUP[g], +pctNum(T.GROUP[g], total).toFixed(2)]))
+    .concat([['', '', '']]).concat(TYPE_ORDER.filter(t => tc[t]).map(t => [typeLong(t) + ' (ทุกประเภท)', tc[t], '']))
+    .concat([['', '', '']]).concat(CHRONIC_ORDER.filter(c => C[c]).map(c => [chronicName(c), C[c], +pctNum(C[c], total).toFixed(2)]))
+    .concat([['', '', '']]).concat(FLAG_ORDER.filter(f => F[f]).map(f => [flagLabel(f), F[f], +pctNum(F[f], total).toFixed(2)]));
+  const osmRows = [['อสม.', 'ประชากรที่ดูแล', 'ต้องติดตาม']].concat((d.osm || []).map(o => [o.name || 'ไม่ระบุ', o.total, o.followUp]));
+  return { title: 'รายงานสิทธิหลักประกันสุขภาพ ' + d.village.label, subtitle: 'สำหรับ อสม. · ' + (d.typeLabel || '') + (d.village.staffName ? ' · จนท. ' + d.village.staffName : '') + ' · ' + lastImportText(d.lastImport),
+    html: kpiCards(T, d.village.label) + typeKpiCards(d) + '<div class="grid g-2 mt"><div class="chart-box"><canvas id="c-rep-vg"></canvas></div><div><div class="sec-t">รายการที่ต้องติดตาม</div>' + flagsHtml(T, vfor, d.typeArea) + '</div></div>' +
+      '<div class="grid g-2 mt"><div><div class="sec-t">กลุ่มโรคเรื้อรัง/กลุ่มเป้าหมาย</div><div class="chart-box short"><canvas id="c-rep-vc"></canvas></div></div><div><div class="sec-t">ความรับผิดชอบของ อสม.</div>' + osmTableHtml(d.osm, vfor) + '</div></div>' +
+      '<div class="sec-t">ประเภทสิทธิหลัก</div>' + mainTableHtml(T, d.lookups) + '<div class="sec-t">สิทธิย่อย</div>' + subTableHtml(T, d.lookups) + '<div class="sec-t">ข้อสังเกต</div>' + insightsHtml(d.insights, '', d.typeArea),
+    sheets: [{ name: 'สรุปหมู่บ้าน', rows: rows }, { name: 'อสม.', rows: osmRows }],
+    after: () => { doughnutGroups('c-rep-vg', T.GROUP, total); chronicChart('c-rep-vc', T); } };
+}
+function reportTypeArea(d) {
+  const tb = d.typeBreakdown || {}, types = TYPE_ORDER.filter(t => tb[t]);
+  const all = types.reduce((s, t) => s + tb[t].total, 0), live = ((tb['1'] || {}).total || 0) + ((tb['3'] || {}).total || 0);
+  const vt = v => types.reduce((s, t) => s + ((v.types || {})[t] || 0), 0);
+  const head = '<tr><th>หมู่บ้าน</th>' + types.map(t => '<th class="r"><span class="swatch" style="background:' + TYPE_COLOR[t] + '"></span>' + esc(typeShort(t)) + '</th>').join('') + '<th class="r">รวม</th><th class="r">อาศัยอยู่จริง (1+3)</th><th class="r">ร้อยละ Type 2</th></tr>';
+  const body = d.villages.map(v => { const n = vt(v), l = ((v.types || {})['1'] || 0) + ((v.types || {})['3'] || 0);
+    return '<tr><td>' + esc(v.label) + (v.staffName ? '<div class="xs muted">จนท. ' + esc(v.staffName) + '</div>' : '') + '</td>' + types.map(t => '<td class="r num">' + fmt((v.types || {})[t] || 0) + '</td>').join('') + '<td class="r num"><b>' + fmt(n) + '</b></td><td class="r num">' + fmt(l) + '</td><td class="r num">' + pct((v.types || {})['2'], n) + '</td></tr>'; }).join('');
+  const foot = '<tr><td>รวม</td>' + types.map(t => '<td class="r num">' + fmt(tb[t].total) + '</td>').join('') + '<td class="r num">' + fmt(all) + '</td><td class="r num">' + fmt(live) + '</td><td class="r num">' + pct((tb['2'] || {}).total, all) + '</td></tr>';
+  const gHead = '<tr><th>ประเภทการอยู่อาศัย</th><th class="r">ประชากร</th><th class="r">ครัวเรือน</th>' + GROUP_ORDER.map(g => '<th class="r">' + esc(groupLabel(g)) + '</th>').join('') + '<th class="r">UC นอกหน่วย</th><th class="r">ไม่สมบูรณ์</th></tr>';
+  const gBody = types.map(t => '<tr><td>' + esc(typeLong(t)) + '</td><td class="r num">' + fmt(tb[t].total) + '</td><td class="r num">' + fmt(tb[t].households) + '</td>' + GROUP_ORDER.map(g => { const n = (tb[t].groups || {})[g] || 0; return '<td class="r num">' + fmt(n) + '<div class="xs muted">' + pct(n, tb[t].total) + '</div></td>'; }).join('') +
+    '<td class="r num">' + fmt(tb[t].outside) + '</td><td class="r num">' + fmt(tb[t].incomplete) + '</td></tr>').join('');
+  const rows = [['หมู่ที่', 'ชื่อหมู่บ้าน'].concat(types.map(typeShort)).concat(['รวม', 'อาศัยอยู่จริง (Type 1+3)', 'ครัวเรือนทั้งหมด'])]
+    .concat(d.villages.map(v => [v.moo, v.name].concat(types.map(t => (v.types || {})[t] || 0)).concat([vt(v), ((v.types || {})['1'] || 0) + ((v.types || {})['3'] || 0), v.households])));
+  const grows = [['ประเภทการอยู่อาศัย', 'ประชากร', 'ครัวเรือน'].concat(GROUP_ORDER.map(groupLabel)).concat(['UC ลงทะเบียนหน่วยอื่น', 'ข้อมูลไม่สมบูรณ์'])]
+    .concat(types.map(t => [typeLong(t), tb[t].total, tb[t].households].concat(GROUP_ORDER.map(g => (tb[t].groups || {})[g] || 0)).concat([tb[t].outside, tb[t].incomplete])));
+  return { title: 'รายงานเป้าหมายประชากรตามประเภทการอยู่อาศัย (Type 1,2,3)', subtitle: 'ประชากรทั้งหมด ' + fmt(all) + ' คน · อาศัยอยู่จริง ' + fmt(live) + ' คน · ครัวเรือน ' + fmt(d.householdsAll) + ' หลัง (อาศัยอยู่จริง ' + fmt(d.householdsLive) + ' หลัง)',
+    html: (types.length ? '' : '<div class="alert alert-warn">' + ico('info') + '<div>ยังไม่มีข้อมูลประเภทการอยู่อาศัย กรุณานำเข้าไฟล์ JHCIS “รายงานเป้าหมายประชากร Type 1,2,3”</div></div>') +
+      '<div class="chart-box tall"><canvas id="c-rep-ty"></canvas></div><div class="tbl-wrap mt"><table class="tbl"><thead>' + head + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + '</tfoot></table></div>' +
+      '<div class="sec-t">กลุ่มสิทธิแยกตามประเภทการอยู่อาศัย</div><div class="tbl-wrap"><table class="tbl"><thead>' + gHead + '</thead><tbody>' + gBody + '</tbody></table></div>' +
+      '<p class="xs muted mt">Type 1 = มีชื่อตามทะเบียนบ้านในเขตและอาศัยอยู่จริง · Type 2 = มีชื่อแต่ตัวไม่อยู่จริง · Type 3 = อาศัยในเขตแต่ทะเบียนบ้านอยู่นอกเขต (นิยามตามมาตรฐานข้อมูล 43 แฟ้ม)</p>',
+    sheets: [{ name: 'Type รายหมู่บ้าน', rows: rows }, { name: 'กลุ่มสิทธิตาม Type', rows: grows }],
+    after: () => typeStackChart('c-rep-ty', d.villages) };
+}
+function reportChronic(d) {
+  const total = d.totals.TOTAL.ALL || 0, C = d.totals.CHRONIC || {}, codes = CHRONIC_ORDER.filter(c => C[c]);
+  const head = '<tr><th>หมู่บ้าน</th><th class="r">ประชากร</th>' + codes.map(c => '<th class="r" title="' + esc(chronicName(c)) + '">' + esc(chronicName(c, true)) + '</th>').join('') + '</tr>';
+  const body = d.villages.map(v => '<tr><td>' + esc(v.label) + '</td><td class="r num">' + fmt(v.total) + '</td>' + codes.map(c => { const n = (v.chronic || {})[c] || 0; return '<td class="r num">' + fmt(n) + '<div class="xs muted">' + pct(n, v.total) + '</div></td>'; }).join('') + '</tr>').join('');
+  const foot = '<tr><td>รวม</td><td class="r num">' + fmt(total) + '</td>' + codes.map(c => '<td class="r num">' + fmt(C[c]) + '<div class="xs muted">' + pct(C[c], total) + '</div></td>').join('') + '</tr>';
+  const rows = [['หมู่ที่', 'ชื่อหมู่บ้าน', 'ประชากร'].concat(codes.map(c => chronicName(c)))].concat(d.villages.map(v => [v.moo, v.name, v.total].concat(codes.map(c => (v.chronic || {})[c] || 0))))
+    .concat([['รวม', '', total].concat(codes.map(c => C[c]))]);
+  return { title: 'รายงานกลุ่มโรคเรื้อรัง/กลุ่มเป้าหมาย', subtitle: (d.typeLabel || '') + ' · ข้อมูลจากรายงาน JHCIS · ' + lastImportText(d.lastImport),
+    html: (codes.length ? '' : '<div class="alert alert-warn">' + ico('info') + '<div>ยังไม่มีข้อมูลโรคเรื้อรังในไฟล์ที่นำเข้า</div></div>') +
+      '<div class="chart-box short"><canvas id="c-rep-ch"></canvas></div><div class="tbl-wrap mt"><table class="tbl"><thead>' + head + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + '</tfoot></table></div>' +
+      '<p class="xs muted mt">ร้อยละคิดจากประชากรในขอบเขตที่เลือก · ดูรายชื่อรายบุคคลได้ที่เมนู "ค้นหาข้อมูลประชาชน" ตัวกรองโรคเรื้อรัง (ตามสิทธิ์ข้อมูลอ่อนไหว)</p>',
+    sheets: [{ name: 'โรคเรื้อรังรายหมู่บ้าน', rows: rows }],
+    after: () => chronicChart('c-rep-ch', d.totals) };
+}
+function reportOsm(d) {
+  const list = d.osm || [], total = d.totals.TOTAL.ALL || 0;
+  const rows = [['ลำดับ', 'อสม. ผู้รับผิดชอบ', 'ประชากรที่ดูแล', 'ร้อยละ', 'รายการต้องติดตาม']].concat(list.map((o, i) => [i + 1, o.name || 'ไม่ระบุ อสม.', o.total, +pctNum(o.total, total).toFixed(2), o.followUp]));
+  return { title: 'รายงานความรับผิดชอบ อสม. ' + d.village.label, subtitle: (d.typeLabel || '') + ' · อสม. ' + list.filter(o => o.name).length + ' คน · ประชากร ' + fmt(total) + ' คน' + (d.village.staffName ? ' · จนท. ' + d.village.staffName : ''),
+    html: osmTableHtml(list, S.profile.role === 'VILLAGE_USER' ? '' : d.village.id) +
+      '<p class="xs muted mt">"ต้องติดตาม" = จำนวนประชากรที่มีรายการตรวจสอบอย่างน้อย 1 รายการ เช่น สิทธิหมดอายุ สิทธิไม่สอดคล้องกับอายุ ลงทะเบียนหน่วยบริการอื่น</p>',
+    sheets: [{ name: 'อสม.', rows: rows }] };
+}
+function fileStamp() { const d = new Date(); return (d.getFullYear() + 543) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '_' + String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0'); }
+function downloadXlsx(name, sheets) {
+  if (!window.XLSX) return toast('โหลดไลบรารี Excel ไม่สำเร็จ', 'err');
+  const wb = XLSX.utils.book_new();
+  sheets.forEach(s => { const ws = XLSX.utils.aoa_to_sheet(s.rows); ws['!cols'] = (s.rows[0] || []).map(() => ({ wch: 18 })); XLSX.utils.book_append_sheet(wb, ws, String(s.name).slice(0, 31)); });
+  XLSX.writeFile(wb, name);
+}
+
+/* ==========================================================================
+   EVENTS
+   ========================================================================== */
+const ACTIONS = {
+  'go': a => go(a.dataset.view),
+  'retry': a => go(a.dataset.view, { refresh: true }),
+  'open-nav': () => document.body.classList.add('nav-open'),
+  'close-nav': () => document.body.classList.remove('nav-open'),
+  'logout': () => logout(),
+  'logout-now': async () => { try { await api('logout', {}); } catch (e) { /* ignore */ } endSession('ออกจากระบบแล้ว', true); },
+  'close-modal': a => closeModal(a),
+  'toggle-pw': a => { const i = document.getElementById(a.dataset.target); i.type = i.type === 'password' ? 'text' : 'password'; a.innerHTML = ico(i.type === 'password' ? 'eye' : 'eyeoff'); },
+  'refresh-overview': () => go('overview', { refresh: true }),
+  'refresh-village': () => go('village', { refresh: true, villageId: S.currentVillage }),
+  'ov-type': a => go('overview', { type: a.dataset.type }),
+  'v-type': a => go('village', { type: a.dataset.type, villageId: S.currentVillage }),
+  'open-village': a => go('village', { villageId: a.dataset.village }),
+  'village-search': () => go('search', { preset: { villageId: S.profile.role === 'VILLAGE_USER' ? '' : S.currentVillage, typeArea: S.vType === 'ALL' ? '' : S.vType, sort: 'house' } }),
+  'village-report': () => go('reports', { type: 'village', villageId: S.currentVillage }),
+  'flag-search': a => go('search', { preset: { flag: a.dataset.flag, villageId: a.dataset.village || '', typeArea: a.dataset.type || '' } }),
+  'insight-search': a => { let p = {}; try { p = JSON.parse(a.dataset.params); } catch (e) { /* ignore */ } go('search', { preset: Object.assign({ villageId: a.dataset.village || '' }, p) }); },
+  'osm-search': a => go('search', { preset: { osm: a.dataset.osm, villageId: a.dataset.village || '', sort: 'house' } }),
+  'chronic-search': a => go('search', { preset: { chronic: a.dataset.chronic, villageId: a.dataset.village || '', sort: 'house' } }),
+  'rebuild-data': async () => { try { const r = await call('rebuildData', {}, { text: 'กำลังคำนวณสรุปใหม่...' }); toast('คำนวณสรุปใหม่แล้ว (' + fmt(r.rows) + ' แถว)', 'ok'); S.overview = null; S.village = {}; renderSettingsView(); } catch (e) { /* toast */ } },
+  'clear-search': () => go('search', { reset: true }),
+  'page': a => { S.search.page = Number(a.dataset.page); runSearch(); window.scrollTo(0, 0); },
+  'person': a => openPerson(a.dataset.key),
+  'export-search': () => exportSearch(),
+  'export-village-table': () => { const r = reportOverview(S.overview); downloadXlsx('สรุปรายหมู่บ้าน_' + fileStamp() + '.xlsx', r.sheets); },
+  'export-history': () => { const rows = S.importHistory || []; downloadXlsx('ประวัติการนำเข้า_' + fileStamp() + '.xlsx', [{ name: 'ประวัติ', rows: [['วันเวลา', 'ผู้ดำเนินการ', 'ไฟล์', 'หมู่บ้าน', 'แถว', 'ใหม่', 'ปรับปรุง', 'ไม่เปลี่ยน', 'ไม่ผ่าน', 'ปิดสถานะ', 'ผล', 'รายละเอียด']].concat(rows.map(r => [r.Timestamp, r.Username, r.FileName, r.VillageIDs, +r.TotalRows, +r.Inserted, +r.Updated, +r.Unchanged, +r.Invalid, +r.Deactivated, r.Status, r.Message])) }]); },
+  'imp-read': () => impRead(),
+  'imp-restart': () => renderImportView(),
+  'imp-validate': () => impValidate(),
+  'imp-back2': () => impStep2(),
+  'imp-back3': () => impStep3(),
+  'imp-commit': () => impCommit(),
+  'user-new': () => userForm(null),
+  'user-edit': a => userForm(S.users.users.find(u => u.userId === a.dataset.id)),
+  'user-template': () => downloadUserTemplate(),
+  'user-reset': async a => {
+    const u = S.users.users.find(x => x.userId === a.dataset.id);
+    if (!(await confirmBox('รีเซ็ตรหัสผ่าน', 'สร้างรหัสผ่านตั้งต้นใหม่ให้ <b>' + esc(u.username) + '</b> และออกจากระบบทุกอุปกรณ์ของผู้ใช้นี้?', 'รีเซ็ต', true))) return;
+    try { const r = await call('manageUsers', { op: 'resetPassword', userId: u.userId }); showTempPassword(u.username, r.tempPassword); renderUsersView({ refresh: true }); } catch (e) { /* toast shown */ }
+  },
+  'user-unlock': async a => { try { await call('manageUsers', { op: 'unlock', userId: a.dataset.id }); toast('ปลดล็อกบัญชีแล้ว', 'ok'); renderUsersView({ refresh: true }); } catch (e) { /* toast */ } },
+  'user-status': async a => {
+    const u = S.users.users.find(x => x.userId === a.dataset.id), st = a.dataset.status;
+    if (!(await confirmBox(st === 'ACTIVE' ? 'เปิดใช้งานบัญชี' : 'ระงับบัญชี', (st === 'ACTIVE' ? 'เปิดใช้งาน' : 'ระงับการใช้งานและออกจากระบบทันที') + ' บัญชี <b>' + esc(u.username) + '</b>?', 'ยืนยัน', st !== 'ACTIVE'))) return;
+    try { await call('manageUsers', { op: 'setStatus', userId: u.userId, status: st }); toast('บันทึกแล้ว', 'ok'); renderUsersView({ refresh: true }); } catch (e) { /* toast */ }
+  },
+  'bulk-download': () => downloadXlsx('รหัสผ่านตั้งต้น_' + fileStamp() + '.xlsx', [{ name: 'บัญชี', rows: [['Username', 'ผล', 'รหัสผ่านตั้งต้น']].concat((S.bulkResult || []).map(x => [x.username, x.ok ? 'สำเร็จ' : x.error, x.tempPassword || ''])) }]),
+  'copy': a => { try { navigator.clipboard.writeText(a.dataset.text); toast('คัดลอกแล้ว', 'ok'); } catch (e) { toast('คัดลอกไม่สำเร็จ', 'err'); } },
+  'save-config': async a => { const k = a.dataset.key; try { await call('updateSystemConfig', { key: k, value: $('#cfg-' + k).value }); toast('บันทึก ' + k + ' แล้ว', 'ok'); S.overview = null; S.village = {}; } catch (e) { /* toast */ } },
+  'save-village': async a => {
+    const id = a.dataset.id;
+    try { await call('updateVillage', { villageId: id, name: $('#vn-' + id).value, note: $('#vt-' + id).value, staffName: $('#vs-' + id).value }); toast('บันทึกข้อมูลหมู่บ้านแล้ว', 'ok');
+      S.profile = await api('me', {}); S.overview = null; S.village = {}; } catch (e) { /* toast */ }
+  },
+  'change-pw': () => showChangePassword(false),
+  'report': a => buildReport(a.dataset.type, {}),
+  'print-report': () => { document.body.classList.add('print-report'); window.print(); setTimeout(() => document.body.classList.remove('print-report'), 500); },
+  'excel-report': () => { const r = S.currentReport; if (r) downloadXlsx(r.title.replace(/[\\/:*?"<>|]/g, '').slice(0, 60) + '_' + fileStamp() + '.xlsx', r.sheets); }
+};
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-action]');
+  if (!a || a.disabled) return;
+  const fn = ACTIONS[a.dataset.action];
+  if (fn) { e.preventDefault(); fn(a, e); }
+});
+['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { S.lastActivity = Date.now(); }, { passive: true }));
+setInterval(() => {   // หมดเวลาฝั่งหน้าเว็บ (เซิร์ฟเวอร์ตรวจซ้ำทุกคำขอ)
+  if (!S.token || !S.profile) return;
+  const idle = (cfg().idleMinutes || 60) * 60000;
+  if (Date.now() - S.lastActivity > idle || (S.profile.expiresAt && Date.now() > S.profile.expiresAt)) {
+    api('logout', {}).catch(() => {});
+    endSession('Session หมดอายุเนื่องจากไม่มีการใช้งาน กรุณาเข้าสู่ระบบใหม่');
+  }
+}, 30000);
+
+/* ---------------- boot ---------------- */
+(async function boot() {
+  $('#logo-lg').innerHTML = ico('logo'); $('#logo-sm').innerHTML = ico('logo');
+  $('[data-action="toggle-pw"]').innerHTML = ico('eye');
+  $('[data-action="open-nav"]').innerHTML = ico('menu');
+  $('#logout-btn').innerHTML = ico('logout', 'ico-sm') + '<span class="hide-sm">ออกจากระบบ</span>';
+  $('#login-form').addEventListener('submit', doLogin);
+  if (!apiConfigured()) {
+    const w = $('#cfg-warning');
+    w.innerHTML = ico('alert') + '<div><b>ยังไม่ได้เชื่อมต่อ Google Apps Script</b><br>เปิดไฟล์ index.html แล้วแก้ค่า <code>GAS_API_URL</code> เป็น URL ของ Web App (ลงท้ายด้วย /exec)</div>';
+    w.hidden = false;
+  }
+  if (!window.Chart || !window.XLSX) toast('โหลดไลบรารีกราฟ/Excel ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต', 'warn');
+  const t = load('shc_token');
+  if (t && apiConfigured()) {
+    S.token = t;
+    try { S.profile = await api('me', {}); startApp(); }
+    catch (e) { S.token = null; store('shc_token', null); }
+  }
+})();
+</script>
+</body>
+</html>
